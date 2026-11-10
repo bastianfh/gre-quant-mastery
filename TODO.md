@@ -2,56 +2,44 @@
 
 Legend: `[ ]` todo · `[~]` in progress · `[x]` implemented **and tested**
 
-## Architecture decisions
-- **Frontend:** Vite + React 18 + TypeScript, react-router (HashRouter), zustand state.
-- **Persistence:** local-first IndexedDB via Dexie (write-through from in-memory store), JSON export/import, session-recovery snapshots.
-- **Question engine:** parametric generators (code computes every answer) → deterministic seeded bank of 1,000+ questions with stable IDs; unlimited variations with fresh seeds; automated validator over the whole bank.
-- **Math:** KaTeX for notation, custom SVG for geometry diagrams and data charts (rendered from the same data the answer is computed from).
-- **Charts:** Recharts for analytics.
-- **AI layer:** optional Node server (`server/index.mjs`) proxies Claude when `ANTHROPIC_API_KEY` is set (key never reaches the browser). Offline tutor (3-level hints, concept summaries, similar-question generation) always works.
-- **Tests:** Vitest (bank validation, grading, mastery, SRS, XP, achievements, calculator, scoring, persistence with fake-indexeddb) + Playwright smoke/E2E script.
+## Milestone 1 — Foundation
+- [x] Project scaffold, config, design system (dark default + light theme; validated chart palette)
+- [x] Curriculum taxonomy (6 categories, 43 units)
+- [x] Core types, seeded RNG, exact fraction math
+- [x] Generators: arithmetic (34), algebra (28), word problems (14), geometry (23, SVG diagrams), data (23, DI charts), strategy & multi-concept (15)
+- [x] Bank: 1,158 validated questions + unlimited variants (`tests/bank.test.ts`)
+- [x] Grading: QC, MCQ, multi-select, numeric incl. fractions (`tests/engine.test.ts`)
+- [x] Persistence: Dexie store, autosave, recovery, export/import (`tests/store.test.ts`, E2E)
+- [x] App shell + 13 screens; question player; explanations with distractor diagnosis
+- [x] Dashboard
 
-## Milestone 1 — Foundation (Priority 1)
-- [ ] Project scaffold, config, design system (dark terminal aesthetic)
-- [ ] Curriculum taxonomy (6 categories, all subtopics)
-- [ ] Core types, seeded RNG, exact fraction math helpers
-- [ ] Generators: Arithmetic
-- [ ] Generators: Algebra
-- [ ] Generators: Word problems
-- [ ] Generators: Geometry (+ SVG diagrams)
-- [ ] Generators: Data analysis (+ data-interpretation charts)
-- [ ] Generators: Strategy / advanced (QC traps, multi-concept)
-- [ ] Bank builder (≥1,000 validated, balanced) + validator test
-- [ ] Answer grading (QC, MCQ, multi-select, numeric incl. fractions)
-- [ ] Persistence layer (Dexie) + store + autosave + recovery
-- [ ] App shell + navigation (12 sections)
-- [ ] Question player component (exam-like) + explanations + distractor diagnosis
-- [ ] Dashboard
+## Milestone 2 — Learning intelligence
+- [x] Transparent mastery model with multi-difficulty evidence caps
+- [x] Elo adaptive difficulty; speed/accuracy quadrants
+- [x] Wrong Answer Lab + SRS (immediate / later today / 1 d / 3 d / 7 d, lapse acceleration, concept variants)
+- [x] Error classification (auto-suggested + user tags)
+- [x] Practice (all filters, timed/untimed, immediate/delayed, hints, skip, save, flag, report)
+- [x] Analytics (overview, topics, time, errors, progress, day history)
+- [x] Diagnostic exam
 
-## Milestone 2 — Learning intelligence (Priority 2)
-- [ ] Mastery model (transparent, multi-difficulty gating)
-- [ ] Elo-style adaptive difficulty selection
-- [ ] Wrong Answer Lab + spaced repetition (0m / same day / 1d / 3d / 7d, lapse acceleration, concept-variant reviews)
-- [ ] Error classification (auto + user tags)
-- [ ] Practice mode (filters, timed/untimed, immediate/delayed feedback, hints, skip, save, flag, report)
-- [ ] Analytics (overall, topic, time, errors, progress history)
-- [ ] Diagnostic exam
+## Milestone 3 — Exam + game layer
+- [x] Full simulation (section-adaptive, navigation, mark, review screen, calculator, 8 forms, results)
+- [x] Score estimation (Rasch, labelled approximate)
+- [x] Learn: 43 lessons + inline practice + mastery checks (`tests/content.test.ts`)
+- [x] Daily challenge, Speed training, QC Arena, Boss challenges
+- [x] XP, 10 levels, 30 achievements, streaks, daily objectives
+- [x] Adaptive 30-day plan (auto-ticking blocks)
+- [x] AI tutor (offline engine + optional Claude server endpoint); verified AI question generation (two-call check)
+- [x] Calculator (order of operations, memory, √, %, Transfer Display) + formula reference with bookmarks
 
-## Milestone 3 — Exam + game layer (Priority 3)
-- [ ] Full GRE simulation (12q/21m + 15q/26m, section-adaptive, nav, mark, review screen, calculator, multiple forms)
-- [ ] Score estimation model (Rasch-based, labeled as approximate)
-- [ ] Learn mode lessons (all units) + mastery checks
-- [ ] Daily challenge (personalized, streak, history)
-- [ ] Speed training (30/45/60/90/120 s, quadrant diagnosis)
-- [ ] QC Arena
-- [ ] Boss challenges (multi-concept, ranks, rewards)
-- [ ] XP, levels, achievements, streaks, daily objectives
-- [ ] Personalized 30-day plan (adaptive daily schedule)
-- [ ] AI tutor (offline + optional Claude), verified AI question generation
-- [ ] Calculator + formula reference with bookmarks
+## Milestone 4 — Polish & QA
+- [x] Responsive/mobile layout (no horizontal overflow; slide-out menu)
+- [x] E2E: every route + core flows, 47 checks, zero console errors (`scripts/e2e.mjs`)
+- [x] Manual math audit of 40 sampled questions (found & fixed a Pythagorean-triple scaling bug)
+- [x] Independent-recomputation tests (`tests/independent.test.ts`)
+- [x] README, PROJECT_STATUS.md
 
-## Milestone 4 — Polish & QA (Priority 4)
-- [ ] Responsive/mobile layout pass
-- [ ] E2E browser test of every route, no console errors
-- [ ] Mathematical sample audit of question bank
-- [ ] README, PROJECT_STATUS.md, final report
+## Possible future work
+- [ ] Live verification of the Claude endpoints with an API key
+- [ ] Cloud sync of progress
+- [ ] More hand-crafted Expert-level multi-concept items

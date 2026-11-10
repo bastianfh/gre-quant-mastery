@@ -351,7 +351,7 @@ const rightApplied: Generator = gen({
   id: Gm('right.applied'), unit: 'ge.right', subtopic: 'Pythagorean theorem', levels: [3, 4, 5],
   skills: ['modeling with right triangles'], concepts: ['Pythagorean theorem', 'Geometric relationships'],
   generate(rng, level) {
-    const [a, b, c] = rng.pick(TRIPLES.slice(0, 3)).map((x) => x * rng.int(1, 3));
+    const k3 = rng.int(1, 3); const [a, b, c] = rng.pick(TRIPLES.slice(0, 3)).map((x) => x * k3);
     if (level === 5) {
       const n = rng.int(3, 6), m = rng.int(2, 5);
       // walk n north, m east, n north, m east...: total displacement
@@ -454,7 +454,7 @@ const rectPerimArea: Generator = gen({
   id: Gm('quad.rectdiag'), unit: 'ge.quads', subtopic: 'Rectangles', levels: [3, 4, 5],
   skills: ['perimeter-area-diagonal relations'], concepts: ['Rectangles', 'Squares', 'Algebraic manipulation'],
   generate(rng, level) {
-    const [a, b, c] = rng.pick(TRIPLES.slice(0, 4)).map((x) => x * rng.int(1, 2));
+    const k2 = rng.int(1, 2); const [a, b, c] = rng.pick(TRIPLES.slice(0, 4)).map((x) => x * k2);
     if (level === 3) {
       const s = rng.int(3, 15);
       return {
@@ -486,7 +486,7 @@ const rhombus: Generator = gen({
   id: Gm('quad.rhombus'), unit: 'ge.quads', subtopic: 'Rhombuses', levels: [3, 4],
   skills: ['rhombus diagonals'], concepts: ['Rhombuses', 'Pythagorean theorem'],
   generate(rng, level) {
-    const [a, b, c] = rng.pick(TRIPLES.slice(0, 3)).map((x) => x * rng.int(1, 2));
+    const k2 = rng.int(1, 2); const [a, b, c] = rng.pick(TRIPLES.slice(0, 3)).map((x) => x * k2);
     const d1 = 2 * a, d2 = 2 * b;
     const diagram: GeoDiagram = { kind: 'geo', width: 300, height: 200, polygons: [{ pts: [P(-b, 0), P(0, a), P(b, 0), P(0, -a)] }], segments: [{ a: P(-b, 0), b: P(b, 0), dashed: true }, { a: P(0, a), b: P(0, -a), dashed: true }], rightAngles: [{ at: P(0, 0), dir1: P(1, 0), dir2: P(0, 1) }], note: NOTE };
     if (level === 3) {
@@ -558,7 +558,7 @@ const inscribed: Generator = gen({
         format: 'mcq', stem: `A circle is inscribed in a square with side length ${s}. What is the area of the region inside the square but outside the circle?`,
         diagram: { kind: 'geo', width: 220, height: 220, polygons: [{ pts: [P(-1, -1), P(1, -1), P(1, 1), P(-1, 1)], shaded: true }], circles: [{ c: P(0, 0), r: 1 }], labels: [{ at: P(0, -1.18), text: `${s}` }] },
         ...textMcq(rng, `$${s * s} - ${(s * s) / 4 === 1 ? '' : (s * s) / 4}\\pi$`, [{ t: `$${s * s} - ${s * s}\\pi$`, note: 'Used the side as the radius.' }, `$${s * s}\\pi - ${s * s}$`, `$${4 * s} - ${s}\\pi$`, `$${s * s} - ${s}\\pi$`]),
-        explanation: [`The circle's diameter equals the side ${s}, so $r = ${s / 2}$.`, `Shaded $= ${s}^2 - \\pi(${s / 2})^2 = ${s * s} - ${(s * s) / 4}\\pi$.`], trap: 'Using the side length as the radius.',
+        explanation: [`The circle's diameter equals the side ${s}, so $r = ${s / 2}$.`, `Shaded $= ${s}^2 - \\pi(${s / 2})^2 = ${s * s} - ${(s * s) / 4 === 1 ? '' : (s * s) / 4}\\pi$.`], trap: 'Using the side length as the radius.',
         hints: H('The circle touches all four sides.', 'Diameter = side of the square.', `r = ${s / 2}.`),
       };
     }
@@ -622,7 +622,7 @@ const spaceDiag: Generator = gen({
   skills: ['3-D Pythagorean theorem'], concepts: ['Space diagonals', 'Three-dimensional geometry', 'Pythagorean theorem'],
   generate(rng, level) {
     const sets = [[2, 3, 6, 7], [1, 4, 8, 9], [2, 6, 9, 11], [4, 4, 7, 9], [3, 4, 12, 13], [2, 10, 11, 15], [6, 6, 7, 11]];
-    const [a, b, c, d] = rng.pick(sets).map((x) => x * (level === 5 ? 1 : rng.int(1, 2)));
+    const kd = level === 5 ? 1 : rng.int(1, 2); const [a, b, c, d] = rng.pick(sets).map((x) => x * kd);
     if (level === 5) {
       const e = rng.int(2, 7);
       return { format: 'mcq', stem: `What is the length of the longest line segment that can be drawn between two vertices of a cube with edge length ${e}?`, ...textMcq(rng, `$${e}\\sqrt{3}$`, [{ t: `$${e}\\sqrt{2}$`, note: 'That is a face diagonal, not the space diagonal.' }, `$${3 * e}$`, `$${e * e}$`, `$${2 * e}$`]), explanation: [`Face diagonal $= ${e}\\sqrt2$; space diagonal $= \\sqrt{(${e}\\sqrt2)^2 + ${e}^2} = ${e}\\sqrt3$.`], trap: 'Stopping at the face diagonal.', hints: H('The longest segment joins opposite corners through the interior.', '$d = \\sqrt{l^2 + w^2 + h^2}$.', `$\\sqrt{3\\cdot ${e * e}}$.`) };
@@ -699,7 +699,7 @@ const circleCoord: Generator = gen({
     if (!opts.some((o) => o.ok) || opts.every((o) => o.ok)) return circleCoord.generate(rng, level);
     return {
       format: 'multi', stem: `A circle in the $xy$-plane has center $(${h}, ${k})$ and radius ${r}. Which of the following points lie ${level === 3 ? '**on**' : 'strictly **inside**'} the circle? Indicate all such points.`, ...multiSel(rng, opts),
-      explanation: [`A point $(x, y)$ is ${level === 3 ? 'on' : 'inside'} the circle when $(x - ${h})^2 + (y - ${k})^2 ${level === 3 ? '=' : '<'} ${r * r}$.`, ...opts.map((o) => `${o.t}: ${o.note} → ${o.ok ? 'yes' : 'no'}.`)],
+      explanation: [`A point $(x, y)$ is ${level === 3 ? 'on' : 'inside'} the circle when $(x ${h < 0 ? '+' : '-'} ${Math.abs(h)})^2 + (y ${k < 0 ? '+' : '-'} ${Math.abs(k)})^2 ${level === 3 ? '=' : '<'} ${r * r}$.`, ...opts.map((o) => `${o.t}: ${o.note} → ${o.ok ? 'yes' : 'no'}.`)],
       trap: 'Comparing the distance (not squared) with r², or forgetting to subtract the center coordinates.',
       hints: H('Compute each point’s distance from the center.', 'Compare squared distances to avoid square roots.', `$r^2 = ${r * r}$.`),
     };
@@ -713,7 +713,7 @@ const geoQc: Generator = gen({
   generate(rng, level) {
     const d = rng.int(2, 9);
     const T = [
-      { lv: 3, given: `A square and a circle each have a diagonal / diameter of length ${d}.`, a: 'The perimeter of the square', b: 'The circumference of the circle', va: 4 * (d / Math.SQRT2), vb: Math.PI * d, proof: [`Square side $= ${d}/\\sqrt2$, perimeter $= ${2 * d}\\sqrt2 \\approx ${(2 * d * Math.SQRT2).toFixed(2)}$.`, `Circumference $= ${d}\\pi \\approx ${(Math.PI * d).toFixed(2)}$.`] },
+      { lv: 3, given: `The diagonal of a square and the diameter of a circle each have length ${d}.`, a: 'The perimeter of the square', b: 'The circumference of the circle', va: 4 * (d / Math.SQRT2), vb: Math.PI * d, proof: [`Square side $= ${d}/\\sqrt2$, perimeter $= ${2 * d}\\sqrt2 \\approx ${(2 * d * Math.SQRT2).toFixed(2)}$.`, `Circumference $= ${d}\\pi \\approx ${(Math.PI * d).toFixed(2)}$.`] },
       { lv: 2, given: `In triangle $XYZ$, $\\angle X = ${50 + d}°$ and $\\angle Y = ${70 - d}°$.`, a: 'The length of side $YZ$', b: 'The length of side $XZ$', va: 50 + d, vb: 70 - d, proof: ['The larger side is opposite the larger angle.', `$YZ$ is opposite $\\angle X = ${50 + d}°$; $XZ$ is opposite $\\angle Y = ${70 - d}°$.`] },
       { lv: 4, given: `The length of each side of an equilateral triangle is ${2 * d}.`, a: 'The area of the triangle', b: `$${d * d * 2}$`, va: Math.sqrt(3) * d * d, vb: 2 * d * d, proof: [`Area $= \\dfrac{\\sqrt3}{4}(${2 * d})^2 = ${d * d}\\sqrt3 \\approx ${(Math.sqrt(3) * d * d).toFixed(2)}$.`] },
       { lv: 4, given: `A rectangle has area ${d * d}.`, a: 'The perimeter of the rectangle', b: `$${4 * d}$`, va: 'D' },

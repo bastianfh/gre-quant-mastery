@@ -2,3 +2,5 @@ node_modules
 dist
 *.log
 .env
+e2e-shots
+question-bank.json

@@ -1,0 +1,132 @@
+import type { Lesson } from './types';
+
+export const GEOMETRY_LESSONS: Lesson[] = [
+  {
+    unit: 'ge.lines',
+    intro: 'Angle questions use a handful of facts: straight lines make 180°, full turns make 360°, vertical angles are equal, and parallel lines cut by a transversal produce only two distinct angle sizes.',
+    concepts: [
+      { title: 'Basic angle facts', body: 'Angles on a straight line sum to 180° (supplementary). Angles around a point sum to 360°. Vertical (opposite) angles are equal.' },
+      { title: 'Parallel lines and a transversal', body: 'All acute angles formed are equal and all obtuse angles are equal; any acute + obtuse pair sums to 180°. Corresponding and alternate interior angles are equal; co-interior (same-side interior) angles are supplementary.' },
+      { title: 'Perpendicular lines', body: 'Perpendicular lines meet at 90°. In the coordinate plane their slopes multiply to $-1$.' },
+      { title: 'Figures not drawn to scale', body: 'GRE figures are not necessarily to scale unless stated. Trust given information and relationships, not appearance.' },
+    ],
+    formulas: [{ label: 'Straight line', tex: '\\alpha + \\beta = 180^\\circ' }, { label: 'Around a point', tex: '\\sum \\theta = 360^\\circ' }],
+    rules: ['With parallel lines: two angles are either equal or supplementary.', 'Write angle relationships as equations and solve.', 'Do not assume lines are parallel unless told.'],
+    examples: [
+      { problem: 'Two angles on a line measure $(3x + 10)°$ and $(2x - 5)°$. Find the larger angle.', steps: ['$5x + 5 = 180 \\Rightarrow x = 35$.', 'Angles 115° and 65°.'], answer: '115°' },
+      { problem: 'Line $\\ell \\parallel m$; a transversal makes a 62° angle with $\\ell$. What is the co-interior angle at $m$?', steps: ['Co-interior angles are supplementary.'], answer: '118°' },
+    ],
+    mistakes: ['Assuming two angles are equal when they are supplementary.', 'Trusting a figure that is not drawn to scale.', 'Reporting $x$ instead of the angle asked.'],
+    strategies: ['Mark every angle you can deduce directly on scratch paper.', 'Look for the “Z” (alternate) and “F” (corresponding) shapes.', 'In QC with figures, ask what could vary while satisfying the given facts.'],
+  },
+  {
+    unit: 'ge.triangles',
+    intro: 'Triangles are the most tested GRE shape. Know angle sums, the triangle inequality, area from any base–height pair, and how similarity scales lengths and areas.',
+    concepts: [
+      { title: 'Angles', body: 'Interior angles sum to 180°. An exterior angle equals the sum of the two remote interior angles.' },
+      { title: 'Sides and angles', body: 'The longest side is opposite the largest angle. Isosceles: equal sides ↔ equal opposite angles. Equilateral: all 60°.' },
+      { title: 'Triangle inequality', body: 'Each side is less than the sum and greater than the difference of the other two: $|a - b| < c < a + b$.' },
+      { title: 'Area', body: '$\\frac12 bh$ with the height perpendicular to the chosen base. Any side can be the base. With two sides $a, b$ fixed, area is largest ($\\frac12 ab$) when they are perpendicular.' },
+      { title: 'Similar triangles', body: 'Equal angles ⇒ similar (AA). Sides scale by $k$, areas by $k^2$. A line parallel to one side cuts off a similar triangle.' },
+    ],
+    formulas: [{ label: 'Area', tex: 'A = \\tfrac12 bh' }, { label: 'Equilateral area', tex: 'A = \\dfrac{\\sqrt3}{4}s^2' }, { label: 'Similarity', tex: '\\text{lengths} \\times k,\\ \\text{areas} \\times k^2' }],
+    rules: ['Congruent triangles: SSS, SAS, ASA, AAS (not SSA).', 'Height can lie outside an obtuse triangle.', 'Corresponding sides of similar triangles are opposite equal angles.'],
+    examples: [
+      { problem: 'Two sides of a triangle are 5 and 11. How many integer lengths are possible for the third side?', steps: ['$6 < s < 16$.', 'Integers 7–15: 9 values.'], answer: '$9$' },
+      { problem: 'In $\\triangle ABC$, $DE \\parallel BC$ with $AD = 4$, $DB = 6$, $BC = 15$. Find $DE$.', steps: ['Scale $AD/AB = 4/10$.', '$DE = 15 \\cdot 0.4 = 6$.'], answer: '$6$' },
+    ],
+    mistakes: ['Using $AD/DB$ instead of $AD/AB$ for similarity.', 'Including the endpoints of the triangle inequality.', 'Assuming a triangle is right or isosceles from the picture.'],
+    strategies: ['Look for similar triangles whenever there are parallel lines.', 'Use the same area with two different base–height pairs to find an unknown height.', 'For extreme-area QC, consider the right-angle configuration.'],
+  },
+  {
+    unit: 'ge.right',
+    intro: 'Right triangles unlock distances, diagonals and heights. Memorize Pythagorean triples and the two special right triangles — they save huge amounts of time.',
+    concepts: [
+      { title: 'Pythagorean theorem', body: '$a^2 + b^2 = c^2$ where $c$ is the hypotenuse (opposite the right angle).' },
+      { title: 'Triples', body: '3-4-5, 5-12-13, 8-15-17, 7-24-25 and their multiples (6-8-10, 9-12-15, 10-24-26…).' },
+      { title: '45-45-90', body: 'Sides $1 : 1 : \\sqrt2$. A square’s diagonal is $s\\sqrt2$.' },
+      { title: '30-60-90', body: 'Sides $1 : \\sqrt3 : 2$ (opposite 30°, 60°, 90°). Half an equilateral triangle.' },
+    ],
+    formulas: [{ label: 'Pythagoras', tex: 'a^2 + b^2 = c^2' }, { label: '45-45-90', tex: 'x,\\ x,\\ x\\sqrt2' }, { label: '30-60-90', tex: 'x,\\ x\\sqrt3,\\ 2x' }],
+    rules: ['The hypotenuse is the longest side.', 'If $a^2 + b^2 > c^2$ (c longest), the triangle is acute; if less, obtuse.', 'Diagonals of rectangles and boxes are hypotenuses.'],
+    examples: [
+      { problem: 'A ladder 13 ft long reaches 12 ft up a wall. How far is its base from the wall?', steps: ['5-12-13 triple.'], answer: '5 ft' },
+      { problem: 'In a 30-60-90 triangle the longer leg is $6\\sqrt3$. Hypotenuse?', steps: ['Short leg 6.', 'Hypotenuse 12.'], answer: '$12$' },
+    ],
+    mistakes: ['Adding squares when finding a leg.', 'Confusing $\\sqrt2$ and $\\sqrt3$ ratios.', 'Missing a scaled triple (e.g. 15-20-25).'],
+    strategies: ['Divide sides by their GCD to spot a triple.', 'Drop altitudes to create special triangles.', 'Leave answers in radical form to match choices.'],
+  },
+  {
+    unit: 'ge.quads',
+    intro: 'Quadrilaterals and polygons combine triangle facts with a few area formulas and angle-sum rules.',
+    concepts: [
+      { title: 'Properties', body: 'Parallelogram: opposite sides parallel and equal, opposite angles equal, diagonals bisect each other. Rectangle: + right angles, equal diagonals. Rhombus: + equal sides, perpendicular diagonals. Square: all of the above.' },
+      { title: 'Areas', body: 'Rectangle $lw$; parallelogram $bh$ (perpendicular height); trapezoid $\\frac12(b_1 + b_2)h$; rhombus $\\frac12 d_1d_2$.' },
+      { title: 'Polygon angles', body: 'Interior sum $(n - 2)180°$. Exterior angles of any convex polygon sum to 360°, so each exterior angle of a regular $n$-gon is $360/n$.' },
+      { title: 'Perimeter vs area', body: 'For a fixed perimeter, the square has the largest area; for a fixed area, the square has the smallest perimeter.' },
+    ],
+    formulas: [{ label: 'Trapezoid', tex: '\\tfrac12(b_1 + b_2)h' }, { label: 'Rhombus', tex: '\\tfrac12 d_1 d_2' }, { label: 'Interior sum', tex: '(n - 2)\\cdot180^\\circ' }],
+    rules: ['A slanted side is not a height.', 'Interior + exterior angle = 180° at each vertex.', 'Diagonal of a rectangle: $\\sqrt{l^2 + w^2} = \\sqrt{(l+w)^2 - 2lw}$.'],
+    examples: [
+      { problem: 'Each interior angle of a regular polygon is 150°. How many sides?', steps: ['Exterior 30°.', '$360/30 = 12$.'], answer: '$12$' },
+      { problem: 'A rectangle has perimeter 34 and area 60. Diagonal?', steps: ['$l + w = 17$, $lw = 60$.', '$d^2 = 289 - 120 = 169$.'], answer: '$13$' },
+    ],
+    mistakes: ['Multiplying parallelogram sides for area.', 'Using $n \\cdot 180$ for the angle sum.', 'Assuming equal perimeters mean equal areas.'],
+    strategies: ['Split complex shapes into rectangles and triangles.', 'Use exterior angles for regular polygons.', 'Use algebraic identities rather than solving for $l$ and $w$.'],
+  },
+  {
+    unit: 'ge.circles',
+    intro: 'Circle problems revolve around the radius. Arcs and sectors are fractions of the full circle; inscribed figures connect circles to triangles and squares.',
+    concepts: [
+      { title: 'Basics', body: 'Diameter $d = 2r$, circumference $2\\pi r$, area $\\pi r^2$. Doubling the radius doubles circumference but quadruples area.' },
+      { title: 'Arcs and sectors', body: 'A central angle $\\theta$ cuts off the fraction $\\frac{\\theta}{360}$ of the circle: arc $= \\frac{\\theta}{360}2\\pi r$, sector $= \\frac{\\theta}{360}\\pi r^2$.' },
+      { title: 'Inscribed angles', body: 'An inscribed angle is half the central angle subtending the same arc. An angle inscribed in a semicircle is 90°.' },
+      { title: 'Inscribed figures', body: 'Square in a circle: diagonal = diameter. Circle in a square: diameter = side. Equilateral triangle in a circle of radius $r$: side $r\\sqrt3$.' },
+      { title: 'Tangents', body: 'A tangent is perpendicular to the radius at the point of contact.' },
+    ],
+    formulas: [{ label: 'Circumference / area', tex: 'C = 2\\pi r,\\ A = \\pi r^2' }, { label: 'Arc', tex: '\\dfrac{\\theta}{360}\\cdot2\\pi r' }, { label: 'Sector', tex: '\\dfrac{\\theta}{360}\\cdot\\pi r^2' }],
+    rules: ['Find the radius first — everything else follows.', 'Shaded regions = big area − small area.', 'All radii of one circle are equal: triangles with two radii are isosceles.'],
+    examples: [
+      { problem: 'A sector of radius 6 has central angle 60°. Arc length?', steps: ['$\\frac16 \\cdot 12\\pi = 2\\pi$.'], answer: '$2\\pi$' },
+      { problem: 'A circle is inscribed in a square of side 8. Area outside the circle?', steps: ['$r = 4$.', '$64 - 16\\pi$.'], answer: '$64 - 16\\pi$' },
+    ],
+    mistakes: ['Using the diameter as the radius.', 'Using 180 instead of 360 in arc fractions.', 'Treating an inscribed angle as central.'],
+    strategies: ['Label every radius in the figure.', 'Keep $\\pi$ symbolic until the end.', 'Look for isosceles triangles formed by two radii.'],
+  },
+  {
+    unit: 'ge.solids',
+    intro: '3-D questions on the GRE are mostly boxes, cubes and cylinders: volume, surface area, space diagonals and scaling.',
+    concepts: [
+      { title: 'Boxes and cubes', body: 'Volume $lwh$, surface area $2(lw + lh + wh)$. Cube: $V = s^3$, $SA = 6s^2$.' },
+      { title: 'Cylinders', body: 'Volume $\\pi r^2 h$; lateral area $2\\pi rh$; total surface $2\\pi r^2 + 2\\pi rh$.' },
+      { title: 'Space diagonal', body: '$d = \\sqrt{l^2 + w^2 + h^2}$; for a cube $s\\sqrt3$.' },
+      { title: 'Scaling and transfers', body: 'Scaling every edge by $k$ scales volume by $k^3$. When liquid moves between containers, volume is conserved.' },
+    ],
+    formulas: [{ label: 'Box', tex: 'V = lwh' }, { label: 'Cylinder', tex: 'V = \\pi r^2 h' }, { label: 'Diagonal', tex: '\\sqrt{l^2 + w^2 + h^2}' }],
+    rules: ['Doubling the radius of a cylinder quadruples its volume.', 'Surface area counts every face.', 'Check units: cubic for volume, square for area.'],
+    examples: [
+      { problem: 'A cube has surface area 150. Volume?', steps: ['Face 25 ⇒ edge 5.'], answer: '$125$' },
+      { problem: 'Water 8 cm deep in a cylinder of radius 3 is poured into one of radius 6. Depth?', steps: ['Area ×4, so depth ÷4.'], answer: '2 cm' },
+    ],
+    mistakes: ['Using a face diagonal for the space diagonal.', 'Scaling volume linearly.', 'Using diameter in $\\pi r^2 h$.'],
+    strategies: ['Use ratios for transfers instead of computing volumes.', 'Remember $k, k^2, k^3$ scaling.', 'Draw the box and label $l$, $w$, $h$.'],
+  },
+  {
+    unit: 'ge.coordinate',
+    intro: 'Coordinate geometry turns shapes into algebra: distance from the Pythagorean theorem, midpoints from averages, and areas from bounding boxes.',
+    concepts: [
+      { title: 'Distance', body: '$d = \\sqrt{(\\Delta x)^2 + (\\Delta y)^2}$ — a right triangle with horizontal and vertical legs.' },
+      { title: 'Midpoint', body: 'Average the coordinates. Missing endpoint: $B = 2M - A$.' },
+      { title: 'Areas', body: 'Use a horizontal or vertical side as base, or enclose the shape in a rectangle and subtract corner triangles (or use the shoelace formula).' },
+      { title: 'Circles', body: '$(x - h)^2 + (y - k)^2 = r^2$. A point is inside when its squared distance to the center is less than $r^2$.' },
+    ],
+    formulas: [{ label: 'Distance', tex: '\\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}' }, { label: 'Midpoint', tex: '\\left(\\tfrac{x_1 + x_2}{2}, \\tfrac{y_1 + y_2}{2}\\right)' }, { label: 'Shoelace', tex: '\\tfrac12|x_1(y_2 - y_3) + x_2(y_3 - y_1) + x_3(y_1 - y_2)|' }],
+    rules: ['Compare squared distances to avoid square roots.', 'Horizontal distance = |Δx|; vertical = |Δy|.', 'Lattice points on circles come from Pythagorean triples.'],
+    examples: [
+      { problem: 'Distance between $(-1, 2)$ and $(5, 10)$?', steps: ['$\\Delta x = 6$, $\\Delta y = 8$.'], answer: '$10$' },
+      { problem: 'Area of the triangle $(0,0)$, $(6,0)$, $(2,5)$?', steps: ['Base 6, height 5.'], answer: '$15$' },
+    ],
+    mistakes: ['Subtracting instead of averaging for midpoints.', 'Forgetting to square differences.', 'Using a slanted side with a non-perpendicular height.'],
+    strategies: ['Sketch the points.', 'Look for triples in Δx and Δy.', 'Box-and-subtract for awkward triangles.'],
+  },
+];

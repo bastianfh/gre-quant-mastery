@@ -1,20 +1,20 @@
 # PROJECT_STATUS — GRE Quant Mastery
 
-_Resume point for development. Keep this current at each milestone._
+## State: feature-complete, tested
+- Unit tests: **70/70** (`npm test`) — bank validation, engine, persistence, lesson content, independent recomputation.
+- End-to-end: **47/47** (`npm run e2e` against `npm start`) — every route, practice/tutor/calculator, persistence across reload, SRS review, daily/speed/QC/boss, full two-section diagnostic, interrupted-exam recovery, lessons, formulas, theming, mobile layout, zero console errors.
+- Bank: 1,158 questions from 137 generators; unlimited variants.
 
-## Current state
-- **Engine complete & tested** (`npm test`):
-  - 137 parametric generators → fixed bank of 1,155 validated questions (`src/engine/bank.ts`), unlimited variants.
-  - QC engine (`generators/qc.ts`) determines relationships by exhaustive edge-case testing with explicit boundary samples; (D) answers carry concrete witnesses.
-  - Grading, mastery (evidence-capped), Elo adaptivity, SRS, Rasch scoring, XP/levels/achievements/objectives, 30-day plan, exam-form builder, calculator.
-  - Persistence: Dexie/IndexedDB store with write-through, export/import, snapshots (`src/store`).
-- **UI:** not started yet (next milestone).
+## How to resume
+1. `npm install && npm run build && npm start` → http://localhost:8787
+2. `npm test`; with the server running, `npm run e2e`.
+3. Generators live in `src/engine/generators/*`; add a generator to the exported array and the bank/validators pick it up automatically.
 
-## Next steps
-1. App shell (HashRouter, sidebar nav, dark theme), Math/Diagram renderers, QuestionPlayer.
-2. Pages: Dashboard, Learn (+ lesson content), Practice, Daily, Speed, QC Arena, Boss, Wrong Answer Lab, Mock/Diagnostic, Analytics, Formulas, Settings.
-3. Server (`server/index.mjs`) for static hosting + optional Claude tutor/generator.
-4. Playwright E2E, mobile check, README.
+## Known issues / limitations
+- Claude endpoints (`server/index.mjs`) are untested live (no API key in the build environment); offline tutor is default.
+- No cloud sync (export/import instead).
 
-## Known issues
-- None open in the engine.
+## Recent fixes
+- Pythagorean-triple scaling bug in 4 geometry generators (per-side multipliers) — fixed and covered by `tests/independent.test.ts`.
+- Segmented controls wrapped in `<label>` mislabeled buttons for assistive tech — replaced with `role="group"` containers.
+- First SRS review moved to "immediately" (was +5 min) per spec.

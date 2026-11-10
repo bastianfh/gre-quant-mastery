@@ -1,0 +1,116 @@
+import type { Lesson } from './types';
+
+export const DATA_LESSONS: Lesson[] = [
+  {
+    unit: 'da.stats',
+    intro: 'Mean, median, mode and range summarize data. The GRE cares less about computing them than about how they respond when data changes.',
+    concepts: [
+      { title: 'Mean via totals', body: 'Sum = mean × count. Most average problems are easiest in totals: adding, removing or replacing values changes the sum.' },
+      { title: 'Median', body: 'Sort first. Odd count: the middle value; even count: the average of the two middle values. The median ignores how extreme the outliers are.' },
+      { title: 'Mode and range', body: 'Mode = most frequent value (there may be several). Range = max − min.' },
+      { title: 'Effects of changes', body: 'Adding a value above the mean raises the mean. Adding a constant to all values shifts mean, median and mode but leaves range unchanged. Multiplying scales them all.' },
+      { title: 'Evenly spaced sets', body: 'Mean = median = (first + last)/2.' },
+    ],
+    formulas: [{ label: 'Mean', tex: '\\bar x = \\dfrac{\\sum x}{n}' }, { label: 'New value needed', tex: 'x = \\bar x_{new}(n + 1) - \\sum x' }],
+    rules: ['Never average averages without weights.', 'An outlier moves the mean more than the median.', 'Sort before finding the median.'],
+    examples: [
+      { problem: 'Scores 82, 90, 75, 88. What fifth score makes the average 85?', steps: ['Need total $425$; have $335$.'], answer: '$90$' },
+      { problem: 'The average of 8 numbers is 20. One number, 34, is removed. New average?', steps: ['$160 - 34 = 126$; $126/7 = 18$.'], answer: '$18$' },
+    ],
+    mistakes: ['Taking the median of unsorted data.', 'Using the old count after adding a value.', 'Assuming mean = median in general.'],
+    strategies: ['Think in totals.', 'Use the balance idea: values above the mean balance those below.', 'In QC, compare structural effects without computing.'],
+  },
+  {
+    unit: 'da.spread',
+    intro: 'Spread measures how dispersed data is. The GRE tests standard deviation conceptually, quartiles and boxplots, percentiles, and the normal distribution’s 68-95 rule.',
+    concepts: [
+      { title: 'Standard deviation', body: 'Roughly the typical distance from the mean. Same mean but values farther out → larger SD. Adding a constant to all values: SD unchanged. Multiplying by $k$: SD × $|k|$.' },
+      { title: 'Quartiles and IQR', body: 'Q1 and Q3 are medians of the lower and upper halves; IQR = Q3 − Q1 contains the middle 50%.' },
+      { title: 'Boxplots', body: 'Show min, Q1, median, Q3, max — not the mean. 25% of the data lies in each section.' },
+      { title: 'Percentiles', body: 'The $p$th percentile is the value below which about $p\\%$ of the data falls.' },
+      { title: 'Normal distribution', body: 'Symmetric bell curve: ≈34% between the mean and 1 SD on each side, ≈13.5% between 1 and 2 SD, ≈2.5% beyond 2 SD. So 68% within 1 SD, 95% within 2 SD.' },
+    ],
+    formulas: [{ label: 'SD', tex: '\\sigma = \\sqrt{\\tfrac1n\\sum(x - \\bar x)^2}' }, { label: 'IQR', tex: 'Q_3 - Q_1' }, { label: 'Normal bands', tex: '34\\% \\mid 13.5\\% \\mid 2.5\\%' }],
+    rules: ['SD is never negative; it is 0 only when all values are equal.', 'A boxplot cannot tell you the mean.', 'Under a normal distribution, 16% lies above +1 SD.'],
+    examples: [
+      { problem: 'Mean 70, SD 5, normal. About what percent score above 80?', steps: ['80 is +2 SD.', '≈2.5%.'], answer: '≈2.5%' },
+      { problem: 'Which has larger SD: {10, 20, 30} or {18, 20, 22}?', steps: ['Same mean, first set is farther from it.'], answer: 'The first set' },
+    ],
+    mistakes: ['Thinking larger numbers mean larger SD.', 'Reading the mean from a boxplot.', 'Misplacing the 34/13.5/2.5 bands.'],
+    strategies: ['Compare spreads visually — don’t compute SD on the GRE.', 'Convert values to SD units before using the normal bands.', 'Use cumulative counts for percentiles.'],
+  },
+  {
+    unit: 'da.counting',
+    intro: 'Counting is about deciding whether order matters and handling restrictions. Multiply independent choices; use combinations when order doesn’t matter.',
+    concepts: [
+      { title: 'Multiplication principle', body: 'If one choice has $m$ options and another $n$, together there are $mn$. Without repetition, the pool shrinks each step.' },
+      { title: 'Permutations', body: 'Ordered arrangements of $r$ from $n$: $\\frac{n!}{(n - r)!}$. All $n$ items in a row: $n!$. With repeated letters divide by the factorials of repeats.' },
+      { title: 'Combinations', body: 'Unordered groups: $\\binom nr = \\frac{n!}{r!(n - r)!}$. Committees, handshakes, pairs of points.' },
+      { title: 'Restrictions', body: '“Together”: glue items into a block. “Not together”: total − together. “At least one”: total − none.' },
+    ],
+    formulas: [{ label: 'Permutations', tex: '{}_nP_r = \\dfrac{n!}{(n - r)!}' }, { label: 'Combinations', tex: '\\binom nr = \\dfrac{n!}{r!(n - r)!}' }, { label: 'Handshakes', tex: '\\binom n2 = \\dfrac{n(n-1)}{2}' }],
+    rules: ['$\\binom nr = \\binom{n}{n - r}$.', 'Different roles (president, VP) → order matters.', 'Diagonals of an $n$-gon: $\\binom n2 - n$.'],
+    examples: [
+      { problem: 'How many 3-person committees from 8 people?', steps: ['$\\binom83 = 56$.'], answer: '$56$' },
+      { problem: '5 people in a row with A and B together?', steps: ['Block: $4! = 24$, times 2.'], answer: '$48$' },
+    ],
+    mistakes: ['Using permutations for committees.', 'Forgetting internal orders of a block.', 'Fixing one required member then choosing freely (double counting).'],
+    strategies: ['Ask: does swapping two chosen items create a new outcome?', 'Use complements for “at least” and “not”.', 'Draw slots and fill them.'],
+  },
+  {
+    unit: 'da.probability',
+    intro: 'Probability = favorable outcomes ÷ total equally likely outcomes. Combine events with the multiplication rule, the addition rule and the complement.',
+    concepts: [
+      { title: 'Basic probability', body: '$P(E) = \\frac{\\text{favorable}}{\\text{total}}$, always between 0 and 1. $P(\\text{not } E) = 1 - P(E)$.' },
+      { title: 'Independent events', body: '$P(A \\text{ and } B) = P(A)P(B)$. Coin flips and dice are independent.' },
+      { title: 'Dependent events', body: 'Without replacement, the second probability changes: $P(\\text{two reds}) = \\frac{r}{n}\\cdot\\frac{r - 1}{n - 1}$.' },
+      { title: 'Or', body: '$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$; for mutually exclusive events the overlap is 0.' },
+      { title: 'Conditional probability', body: '$P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$ — restrict the sample space to $B$. Two-way tables make this concrete.' },
+    ],
+    formulas: [{ label: 'Complement', tex: 'P(\\ge1) = 1 - P(\\text{none})' }, { label: 'Union', tex: 'P(A) + P(B) - P(A\\cap B)' }, { label: 'Conditional', tex: 'P(A\\mid B) = \\dfrac{P(A\\cap B)}{P(B)}' }, { label: 'Exactly k of n flips', tex: '\\binom nk / 2^n' }],
+    rules: ['“At least one” → complement.', 'Multiply along a sequence; add across distinct cases.', 'Different orders of the same outcome are separate cases (red-blue and blue-red).'],
+    examples: [
+      { problem: 'A fair coin is tossed 3 times. P(at least one head)?', steps: ['$1 - (\\frac12)^3$.'], answer: '$\\frac78$' },
+      { problem: '4 red, 3 blue; draw 2 without replacement. P(both red)?', steps: ['$\\frac47\\cdot\\frac36 = \\frac27$.'], answer: '$\\frac27$' },
+    ],
+    mistakes: ['Adding probabilities of overlapping events.', 'Treating draws without replacement as independent.', 'Dividing by the grand total in conditional questions.'],
+    strategies: ['Use the complement whenever “at least” appears.', 'Count with combinations for multi-item draws.', 'Use symmetry (e.g. more heads vs more tails).'],
+  },
+  {
+    unit: 'da.sets',
+    intro: 'Overlapping-group problems are solved with Venn diagrams (one characteristic each) or a double matrix (two characteristics with complementary categories).',
+    concepts: [
+      { title: 'Two sets', body: 'Total = A + B − both + neither.' },
+      { title: 'Three sets', body: '$|A \\cup B \\cup C| = A + B + C - (AB + AC + BC) + ABC$. People in exactly two groups are counted twice in $A + B + C$; those in all three, three times.' },
+      { title: 'Double matrix', body: 'For categories like male/female × degree/no degree, build a 2×2 table with totals; every row and column must add up.' },
+      { title: 'Max/min overlap', body: 'Overlap ≥ A + B − total and ≤ min(A, B).' },
+    ],
+    formulas: [{ label: 'Two sets', tex: 'T = A + B - \\text{both} + \\text{neither}' }, { label: 'Three sets', tex: 'A + B + C - \\text{pairs} + \\text{triple}' }],
+    rules: ['Fill Venn regions from the inside (all three) out.', 'Check that totals reconcile.', 'Percent problems: assume a total of 100.'],
+    examples: [
+      { problem: '40 students: 25 take French, 18 Spanish, 7 both. How many take neither?', steps: ['At least one: $25 + 18 - 7 = 36$.'], answer: '$4$' },
+      { problem: '60% own a car, 70% a bike. Minimum who own both?', steps: ['$60 + 70 - 100 = 30$.'], answer: '30%' },
+    ],
+    mistakes: ['Not subtracting the overlap.', 'Forgetting the “neither” group.', 'Omitting the triple-overlap correction.'],
+    strategies: ['Draw the diagram every time.', 'Use a matrix when each person is in exactly one row and one column.', 'Assign 100 for percent problems.'],
+  },
+  {
+    unit: 'da.interpretation',
+    intro: 'Data interpretation questions present a table or graph and ask you to extract, combine and compare values. Precision in reading beats speed — then estimate the arithmetic.',
+    concepts: [
+      { title: 'Read the frame first', body: 'Title, units (thousands? percent?), axes scales and legend. Many errors come from misread units.' },
+      { title: 'Percent vs absolute change', body: 'The largest absolute increase is not necessarily the largest percent increase; a small starting value inflates percent change.' },
+      { title: 'Pie charts', body: 'Slices are percents of a total; central angle = percent × 360°. To compare across two pies, convert to amounts.' },
+      { title: 'Combining data', body: 'Totals and weighted averages across categories; the percent change of a total is not the average of the percent changes.' },
+      { title: 'Scatterplots & histograms', body: 'Scatterplots show association (positive/negative); histograms show frequencies by interval — the median class comes from cumulative counts, not the tallest bar.' },
+    ],
+    formulas: [{ label: 'Percent change', tex: '\\dfrac{\\text{new} - \\text{old}}{\\text{old}}' }, { label: 'Central angle', tex: '\\dfrac{p}{100}\\times 360^\\circ' }],
+    rules: ['Check whether a question asks for a value, a difference, a ratio or a percent.', 'Estimate when answer choices are spread out.', 'A ratio question is not a difference question.'],
+    examples: [
+      { problem: 'Sales went 40 → 60 in region A and 150 → 180 in region B. Which had the larger percent increase?', steps: ['A: 50%. B: 20%.'], answer: 'Region A' },
+      { problem: 'A budget slice is 15% of \\$4,000. Its central angle?', steps: ['$0.15 \\times 360 = 54$.'], answer: '54°' },
+    ],
+    mistakes: ['Ignoring units in the title.', 'Confusing absolute and percent change.', 'Choosing the mode class as the median class.'],
+    strategies: ['Spend 15 seconds understanding the chart before reading questions.', 'Round chart values sensibly; GRE choices usually allow it.', 'Use the calculator for multi-step ratios, but set up first.'],
+  },
+];

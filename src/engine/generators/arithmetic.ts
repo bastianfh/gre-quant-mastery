@@ -78,7 +78,7 @@ const orderOps: Generator = gen({
       stem: `What is the value of $${expr}$?`,
       ...mc,
       explanation: [
-        `Parentheses first: $${b} - ${c}\\cdot${d} = ${inner}$, so the squared term is $${inner}^2 = ${sq}$ and $\\dfrac{${sq}}{${div}} = ${sq / div}$.`,
+        `Parentheses first: $${b} - ${c}\\cdot${d} = ${inner}$, so the squared term is $(${inner})^2 = ${sq}$ and $\\dfrac{${sq}}{${div}} = ${sq / div}$.`,
         `Exponent before negation: $-${a}^2 = -(${a}^2) = -${a * a}$.`,
         ...(level >= 2 ? [`$${c}(${b} - ${a}) = ${c * (b - a)}$.`] : []),
         `Total: $${-(a * a)} + ${sq / div}${level >= 2 ? ` + ${c * (b - a)}` : ''} = ${value}$.`,

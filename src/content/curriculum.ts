@@ -1,15 +1,15 @@
 import type { CategoryId } from '../engine/types';
 
-export interface Category { id: CategoryId; name: string; short: string; color: string; examWeight: number }
+export interface Category { id: CategoryId; name: string; short: string; color: string; slot: number; examWeight: number }
 export interface Unit { id: string; category: CategoryId; name: string; concepts: string[]; week: 1 | 2 | 3 }
 
 export const CATEGORIES: Category[] = [
-  { id: 'arithmetic', name: 'Arithmetic', short: 'ARI', color: '#4ea8ff', examWeight: 0.27 },
-  { id: 'algebra', name: 'Algebra', short: 'ALG', color: '#37d6a5', examWeight: 0.24 },
-  { id: 'word', name: 'Word Problems', short: 'WRD', color: '#f2b84b', examWeight: 0.14 },
-  { id: 'geometry', name: 'Geometry', short: 'GEO', color: '#b48cff', examWeight: 0.15 },
-  { id: 'data', name: 'Data Analysis', short: 'DAT', color: '#ff7a8a', examWeight: 0.2 },
-  { id: 'strategy', name: 'Advanced Strategy', short: 'STR', color: '#9aa7b8', examWeight: 0 },
+  { id: 'arithmetic', name: 'Arithmetic', short: 'ARI', color: 'var(--s1)', slot: 1, examWeight: 0.27 },
+  { id: 'algebra', name: 'Algebra', short: 'ALG', color: 'var(--s2)', slot: 2, examWeight: 0.24 },
+  { id: 'word', name: 'Word Problems', short: 'WRD', color: 'var(--s3)', slot: 3, examWeight: 0.14 },
+  { id: 'geometry', name: 'Geometry', short: 'GEO', color: 'var(--s4)', slot: 4, examWeight: 0.15 },
+  { id: 'data', name: 'Data Analysis', short: 'DAT', color: 'var(--s5)', slot: 5, examWeight: 0.2 },
+  { id: 'strategy', name: 'Advanced Strategy', short: 'STR', color: 'var(--s7)', slot: 7, examWeight: 0 },
 ];
 export const CATEGORY_BY_ID = Object.fromEntries(CATEGORIES.map((c) => [c.id, c])) as Record<CategoryId, Category>;
 

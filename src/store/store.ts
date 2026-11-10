@@ -216,7 +216,9 @@ export const useStore = create<State>((set, get) => {
       const nl = { ...log };
       if (sr.mode === 'speed') nl.speedDrills = log.speedDrills + 1;
       if (sr.mode === 'daily') nl.dailyChallengeScore = Math.max(log.dailyChallengeScore ?? 0, sr.score ?? 0);
-      if (planBlock) nl.planDone = { ...log.planDone, [planBlock]: true };
+      if (planBlock) nl.planDone = { ...nl.planDone, [planBlock]: true };
+      const kind = ({ daily: 'daily', boss: 'boss', review: 'review', speed: 'speed', qc: 'qc', mastery: 'lesson' } as Record<string, string>)[sr.mode];
+      if (kind) nl.planDone = { ...nl.planDone, [`${log.date}:${kind}`]: true };
       await saveLog(nl);
       if (xpBonus) { await gainXp(xpBonus); get().pushToast({ kind: 'xp', text: `+${xpBonus} XP`, sub: 'Session complete' }); }
       await checkAchievements();
@@ -227,6 +229,8 @@ export const useStore = create<State>((set, get) => {
       set((s) => ({ exams: [...s.exams, e] })); bump();
       await safe(db.exams.put(e), fail);
       if (e.kind === 'diagnostic') await saveProfile({ ...get().profile, diagnosticDone: true });
+      const log = touchLog();
+      await saveLog({ ...log, planDone: { ...log.planDone, [`${log.date}:${e.kind}`]: true } });
       await gainXp(e.kind === 'mock' ? XP_EVENTS.mock + e.raw * 4 : XP_EVENTS.diagnostic);
       await checkAchievements();
     },
@@ -245,6 +249,8 @@ export const useStore = create<State>((set, get) => {
       const p = get().profile;
       if (p.lessonsCompleted[unit]) return;
       await saveProfile({ ...p, lessonsCompleted: { ...p.lessonsCompleted, [unit]: Date.now() } });
+      const log = touchLog();
+      await saveLog({ ...log, planDone: { ...log.planDone, [`${log.date}:lesson`]: true } });
       await gainXp(XP_EVENTS.lesson);
       get().pushToast({ kind: 'xp', text: `+${XP_EVENTS.lesson} XP`, sub: 'Lesson completed' });
       await checkAchievements();

@@ -465,8 +465,8 @@ const vieta: Generator = gen({
     const b = -(r + s), c = r * s;
     if (level === 4) {
       return {
-        format: 'numeric', stem: `One solution of $x^2 + bx + ${c} = 0$ is $x = ${r}$. What is the value of $b$?`, answer: numAns(b),
-        explanation: [`Product of roots $= ${c}$, so the other root is $${c}/${r} = ${s}$.`, `Sum of roots $= -b = ${r + s}$, so $b = ${b}$.`, `Check: $(${r})^2 + (${b})(${r}) + ${c} = ${r * r + b * r + c}$ ✓.`],
+        format: 'numeric', stem: `One solution of $x^2 + bx ${c < 0 ? '-' : '+'} ${Math.abs(c)} = 0$ is $x = ${r}$. What is the value of $b$?`, answer: numAns(b),
+        explanation: [`Product of roots $= ${c}$, so the other root is $${c}/${r} = ${s}$.`, `Sum of roots $= -b = ${r + s}$, so $b = ${b}$.`, `Check: $(${r})^2 + (${b})(${r}) ${c < 0 ? '-' : '+'} ${Math.abs(c)} = ${r * r + b * r + c}$ ✓.`],
         trap: 'Sign error: the sum of roots is $-b$, not $b$.',
         hints: H('Substitute the known root into the equation.', 'Or: product of roots = c, sum = −b.', `$${r * r} + ${r}b + ${c} = 0$.`),
       };

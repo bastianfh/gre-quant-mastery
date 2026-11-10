@@ -4,7 +4,8 @@ const MIN = 60000, HOUR = 60 * MIN, DAY = 24 * HOUR;
 /** Sentinel due date for graduated items (JSON-safe, unlike Infinity). */
 export const NEVER = 8.64e15;
 /** Stage → interval before the next review. Stage 0 = immediate (end of session), 1 = later same day, 2 = 1 day, 3 = 3 days, 4 = 7 days. */
-export const SRS_INTERVALS = [5 * MIN, 4 * HOUR, 1 * DAY, 3 * DAY, 7 * DAY];
+export const SRS_INTERVALS = [0, 4 * HOUR, 1 * DAY, 3 * DAY, 7 * DAY];
+void MIN;
 export const SRS_STAGE_NAMES = ['Immediate', 'Later today', 'Tomorrow', 'In 3 days', 'In 7 days', 'Graduated'];
 
 /** Repeated lapses shrink intervals so recurring mistakes come back more often. */
