@@ -1,6 +1,6 @@
 import type { Attempt, CategoryId, DailyLog, ErrorType, ExamResult, Format, SrsItem } from '../engine/types';
 import { computeMastery, type MasteryResult } from '../engine/mastery';
-import { estimateScore, type ScoreEstimate } from '../engine/scoring';
+import { estimateScore, type OfficialScore, type ScoreEstimate } from '../engine/scoring';
 import { CATEGORIES, MAIN_CATEGORIES, UNITS } from '../content/curriculum';
 import type { QStat } from '../engine/selection';
 import { dayKey, streaks } from '../engine/gamification';
@@ -25,11 +25,12 @@ export interface Derived {
   timeLimitStats: { limit: number; n: number; correct: number }[];
 }
 
-interface Src { attempts: Attempt[]; exams: ExamResult[]; srs: Record<string, SrsItem>; daily: Record<string, DailyLog>; version: number }
+interface Src { attempts: Attempt[]; exams: ExamResult[]; srs: Record<string, SrsItem>; daily: Record<string, DailyLog>; version: number; profile?: { officialScores?: OfficialScore[] } }
 let cacheKey = '', cache: Derived | null = null;
 
 export function computeDerived(s: Src, now = Date.now()): Derived {
-  const k = `${s.version}|${s.attempts.length}|${s.exams.length}|${Object.keys(s.srs).length}|${Math.floor(now / 60000)}`;
+  const official = s.profile?.officialScores ?? [];
+  const k = `${s.version}|${official.length}|${s.attempts.length}|${s.exams.length}|${Object.keys(s.srs).length}|${Math.floor(now / 60000)}`;
   if (k === cacheKey && cache) return cache;
   const at = s.attempts;
   const byUnit = new Map<string, Attempt[]>(), byCat = new Map<string, Attempt[]>();
@@ -60,7 +61,7 @@ export function computeDerived(s: Src, now = Date.now()): Derived {
   const reviewTimeSec = at.filter((a) => a.isReview).reduce((x, a) => x + a.timeMs / 1000, 0);
   const mainUnits = UNITS.filter((u) => MAIN_CATEGORIES.includes(u.category));
   const coverage = mainUnits.filter((u) => (byUnit.get(u.id)?.length ?? 0) >= 3).length / mainUnits.length;
-  const estimate = estimateScore(at, s.exams, coverage, now);
+  const estimate = estimateScore(at, s.exams, coverage, now, official);
 
   const weakUnits = UNITS.map((u) => ({ unit: u.id, score: unitMastery[u.id].score, n: unitMastery[u.id].n }))
     .filter((x) => x.n >= 3).sort((a, b) => a.score - b.score);
@@ -88,7 +89,7 @@ export function computeDerived(s: Src, now = Date.now()): Derived {
     const end = xs[xs.length - 1].ts;
     const upto = at.filter((a) => a.ts <= end);
     const ex = s.exams.filter((e) => e.finishedAt <= end);
-    const est = estimateScore(upto, ex, coverage, end).score;
+    const est = estimateScore(upto, ex, coverage, end, official).score;
     return { date: d, n: xs.length, correct: xs.filter((a) => a.correct).length, accuracy: xs.filter((a) => a.correct).length / xs.length, avgTimeSec: xs.reduce((x, a) => x + a.timeMs, 0) / xs.length / 1000, est };
   });
   const weeksMap = new Map<string, Attempt[]>();

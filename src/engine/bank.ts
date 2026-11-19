@@ -14,7 +14,7 @@ const seedFor = (gid: string, level: number, seed: number) => (hashString(gid) ^
 
 /** Deterministically build a question. Throws on generator errors. */
 export function makeQuestion(g: Generator, level: Level, seed: number, source: Question['source'] = 'bank'): Question {
-  const rng = new RNG(seedFor(g.id, level, seed));
+  const rng = new RNG(seedFor(g.setOf?.base ?? g.id, level, seed));
   const out = g.generate(rng, level);
   const unit = UNIT_BY_ID[g.unit];
   if (!unit) throw new Error(`unknown unit ${g.unit}`);
@@ -34,6 +34,7 @@ export function makeQuestion(g: Generator, level: Level, seed: number, source: Q
     skills: out.skills ?? g.skills,
     concepts: out.concepts ?? g.concepts,
     source,
+    ...(g.setOf ? { setId: `${g.setOf.base}~${level}~${seed}`, setIndex: g.setOf.index, setSize: g.setOf.size } : {}),
   };
   return q;
 }

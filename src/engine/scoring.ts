@@ -50,7 +50,44 @@ export interface ScoreEstimate {
  *  - full simulations (weight grows with the number of mocks),
  *  - a coverage penalty when major topics have little data.
  */
-export function estimateScore(attempts: Attempt[], exams: ExamResult[], coverage: number, now = Date.now()): ScoreEstimate {
+/** An official practice-test result (e.g. ETS POWERPREP), with the app's own estimate at the moment it was entered. */
+export interface OfficialScore { id: string; ts: number; date: string; score: number; source: string; modelScore: number | null }
+
+/**
+ * Calibration offset from official results: mean of (official − model estimate at that time) over the last 3,
+ * shrunk toward 0 when there are few results (n/(n+1)) and capped at ±12.
+ */
+export function calibrationOffset(official: OfficialScore[]): { offset: number; n: number } {
+  const usable = official.filter((o) => o.modelScore !== null).slice(-3);
+  if (!usable.length) return { offset: 0, n: 0 };
+  const meanResidual = usable.reduce((a, o) => a + (o.score - (o.modelScore as number)), 0) / usable.length;
+  const shrink = usable.length / (usable.length + 1);
+  return { offset: Math.max(-12, Math.min(12, Math.round(meanResidual * shrink))), n: usable.length };
+}
+
+/** Score estimate, calibrated by any official practice-test results entered on or before `now`. */
+export function estimateScore(attempts: Attempt[], exams: ExamResult[], coverage: number, now = Date.now(), official: OfficialScore[] = []): ScoreEstimate {
+  const model = modelEstimate(attempts, exams, coverage, now);
+  const prior = official.filter((o) => o.ts <= now).sort((a, b) => a.ts - b.ts);
+  if (!prior.length) return model;
+  const latest = prior[prior.length - 1];
+  const components = [...model.components, { label: `Latest official test (${latest.source}, ${latest.date})`, value: String(latest.score) }];
+  if (model.score === null) {
+    // no practice data yet: the official result is the best available estimate
+    return { ...model, score: latest.score, range: [Math.max(130, latest.score - 4), Math.min(170, latest.score + 4)], confidence: 'low', components };
+  }
+  const { offset, n } = calibrationOffset(prior);
+  if (!offset) return { ...model, components: [...components, { label: 'Calibration', value: n ? 'model already matches your official results' : 'enter official results to calibrate' }] };
+  const score = Math.max(130, Math.min(170, model.score + offset));
+  const [lo, hi] = model.range!;
+  const half = Math.max(2, Math.round((hi - lo) / 2) - (n >= 2 ? 1 : 0));
+  return {
+    ...model, score, range: [Math.max(130, score - half), Math.min(170, score + half)],
+    components: [...components, { label: `Calibration from ${n} official result${n > 1 ? 's' : ''}`, value: `${offset > 0 ? '+' : ''}${offset}` }],
+  };
+}
+
+function modelEstimate(attempts: Attempt[], exams: ExamResult[], coverage: number, now = Date.now()): ScoreEstimate {
   const recent = attempts.filter((a) => !a.skipped).slice(-250);
   const components: ScoreEstimate['components'] = [];
   if (recent.length < 10 && exams.length === 0) return { score: null, range: null, practiceScore: null, mockScore: null, confidence: 'none', components: [{ label: 'Data', value: `${recent.length}/10 questions needed` }] };

@@ -1,5 +1,6 @@
 import { RNG } from '../lib/rng';
-import { extraQuestions, getBank, makeVariant, GEN_BY_ID } from './bank';
+import { extraQuestions, getBank, getQuestion, makeQuestion, makeVariant, GEN_BY_ID } from './bank';
+import { DI_SET_BASES } from './generators/disets';
 import { DEFAULT_RATING, targetLevel } from './adaptive';
 import type { CategoryId, Format, Level, Question } from './types';
 import { ALL_GENERATORS } from './generators';
@@ -50,7 +51,14 @@ export function pool(f: Filter, ctx: PickCtx): Question[] {
 }
 
 /** Weighted sampling: adaptive difficulty, novelty, weakness emphasis, anti-repetition. */
-export function pickQuestions(f: Filter, count: number, ctx: PickCtx, opts: { adaptive?: boolean; seed?: number; sortByLevel?: boolean } = {}): Question[] {
+/** All questions of the shared-data set a question belongs to, in set order. */
+export function setMembers(q: Question): Question[] {
+  if (!q.setId || !q.setSize) return [q];
+  const [base, lv, seed] = q.setId.split('~');
+  return Array.from({ length: q.setSize }, (_, k) => (k === q.setIndex ? q : getQuestion(`${base}.q${k + 1}~${lv}~${seed}`))).filter(Boolean) as Question[];
+}
+
+export function pickQuestions(f: Filter, count: number, ctx: PickCtx, opts: { adaptive?: boolean; seed?: number; sortByLevel?: boolean; keepSets?: boolean } = {}): Question[] {
   const rng = new RNG(opts.seed ?? (Date.now() & 0x7fffffff));
   const candidates = pool(f, ctx);
   const recentSet = new Set(ctx.recent.slice(-60));
@@ -83,7 +91,11 @@ export function pickQuestions(f: Filter, count: number, ctx: PickCtx, opts: { ad
     let x = rng.next() * tot, idx = 0;
     while (idx < arr.length - 1 && (x -= ws[idx]) > 0) idx++;
     const q = arr[idx];
-    out.push(q); usedGens.push(q.generatorId); avail.delete(q);
+    const group = q.setId && opts.keepSets !== false ? setMembers(q).filter((m) => !out.some((o) => o.id === m.id)) : [q];
+    for (const m of group) {
+      if (out.length >= count && m !== q) break;
+      out.push(m); usedGens.push(m.generatorId); avail.delete(m);
+    }
   }
   // not enough bank questions → generate fresh variants that match the filter
   if (out.length < count) {
@@ -139,7 +151,14 @@ export function buildSection(section: 1 | 2, path: Path, formSeed: number, exclu
   const bank = [...getBank()];
   const chosen: Question[] = [];
   const used = new Set<string>(), usedGen = new Set<string>();
+  let diSet: Question[] = [];
+  if (section === 2) {
+    const base = rng.pick(DI_SET_BASES);
+    const lv: Level = path === 'harder' ? 5 : path === 'medium' ? 4 : 3;
+    diSet = [0, 1, 2].map((k) => makeQuestion(GEN_BY_ID[`${base}.q${k + 1}`], lv, 2000 + formSeed, 'variant'));
+  }
   slots.forEach((slot, i) => {
+    if (slot.di && diSet.length) { const q = diSet.shift()!; used.add(q.id); usedGen.add(q.generatorId); chosen.push(q); return; }
     const want = levels[i % levels.length];
     const fits = (q: Question, lvTol: number, strictGen: boolean) => q.format === slot.format && !!slot.di === q.di && (slot.di || !slot.category || q.category === slot.category || (slot.format === 'qc' && q.category === 'strategy')) && Math.abs(q.level - want) <= lvTol && !used.has(q.id) && (!strictGen || !usedGen.has(q.generatorId));
     let cands: Question[] = [];

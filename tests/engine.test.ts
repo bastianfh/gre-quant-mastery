@@ -1,7 +1,7 @@
 import { isCorrect, parseNumeric, diagnose } from '../src/engine/grading';
 import { computeMastery } from '../src/engine/mastery';
 import { onMiss, onReview, SRS_INTERVALS, isDue, reviewUsesVariant } from '../src/engine/srs';
-import { estimateTheta, scoreExam, estimateScore } from '../src/engine/scoring';
+import { estimateTheta, scoreExam, estimateScore, calibrationOffset } from '../src/engine/scoring';
 import { xpForAttempt, levelOf, streaks, dayKey, addDays, ACHIEVEMENTS } from '../src/engine/gamification';
 import { computeRatings, targetLevel, expected, quadrant } from '../src/engine/adaptive';
 import { evaluate, press, initCalc, type CalcState } from '../src/lib/calc';
@@ -273,5 +273,73 @@ describe('study plan', () => {
     const mins = late.blocks.reduce((a, b) => a + b.minutes, 0);
     expect(mins).toBeGreaterThan(50);
     expect(mins).toBeLessThan(160);
+  });
+});
+
+describe('official-score calibration', () => {
+  const at = Array.from({ length: 60 }, (_, i) => mkAttempt({ level: 3, correct: i % 4 !== 0, ts: Date.now() - 1000 }));
+  const base = estimateScore(at, [], 1).score!;
+  const off = (score: number, model: number | null, ts = Date.now() - 500) => ({ id: String(score) + ts, ts, date: '2026-11-01', score, source: 'POWERPREP Online', modelScore: model });
+  it('no official results leaves the estimate unchanged', () => {
+    expect(estimateScore(at, [], 1, Date.now(), []).score).toBe(base);
+  });
+  it('shifts the estimate toward official results, shrunk for few results', () => {
+    const one = estimateScore(at, [], 1, Date.now(), [off(base + 8, base)]);
+    expect(one.score).toBe(base + 4); // 8 × 1/2
+    const three = estimateScore(at, [], 1, Date.now(), [off(base + 8, base, Date.now() - 900), off(base + 8, base, Date.now() - 800), off(base + 8, base, Date.now() - 700)]);
+    expect(three.score).toBe(base + 6); // 8 × 3/4
+  });
+  it('caps the correction and stays within 130–170', () => {
+    expect(calibrationOffset([off(170, 130), off(170, 130)]).offset).toBe(12);
+    expect(estimateScore(at, [], 1, Date.now(), [off(130, 170)]).score).toBeGreaterThanOrEqual(130);
+  });
+  it('ignores results entered after the evaluation time (keeps history honest)', () => {
+    expect(estimateScore(at, [], 1, Date.now() - 10_000, [off(base + 10, base, Date.now())]).score).toBe(estimateScore(at, [], 1, Date.now() - 10_000).score);
+  });
+  it('uses the official score when there is no practice data yet', () => {
+    expect(estimateScore([], [], 0, Date.now(), [off(158, null)]).score).toBe(158);
+  });
+});
+
+describe('timing strategy', () => {
+  it('finds time sinks, wasted time, over-cap misses and blanks at the buzzer', async () => {
+    const { analyzeTiming } = await import('../src/engine/timing');
+    const s1 = buildSection(1, 'medium', 3, new Set());
+    const s2 = buildSection(2, 'medium', 3, new Set(s1.map((q) => q.id)));
+    const mk = (qs: Question[], limit: number, used: number, f: (i: number) => [number, boolean, boolean]) => ({
+      qids: qs.map((q) => q.id), answers: qs.map((_, i) => (f(i)[2] ? null : 0)), correct: qs.map((_, i) => f(i)[1]), timeMs: qs.map((_, i) => f(i)[0] * 1000), timeUsedSec: used, limitSec: limit, marked: qs.map(() => false),
+    });
+    const exam = { id: 'x', kind: 'mock' as const, form: 'A', startedAt: 0, finishedAt: 1, path: 'medium' as const, raw: 0, scaled: 150, range: [148, 152] as [number, number],
+      sections: [mk(s1, 1260, 1260, (i) => [i === 0 ? 300 : 80, i > 1 && i < 10, i >= 10]), mk(s2, 1560, 900, (i) => [60, true, false])] };
+    const t = analyzeTiming(exam, (id) => getQuestion(id), (_q, a) => a === null);
+    expect(t.sinks[0].timeSec).toBe(300);
+    expect(t.overCapWrong).toBe(1);
+    expect(t.blanksAtEnd).toBe(2);
+    expect(t.wastedSec).toBe(300 + 80 + 2 * 80);
+    expect(t.pacing[0]).toHaveLength(12);
+    expect(t.pacing[1][14].even).toBeCloseTo(26, 0);
+    expect(t.advice.join(' ')).toMatch(/left blank/);
+  });
+});
+
+describe('data-interpretation sets in exams and practice', () => {
+  it('mock section 2 contains one complete, consecutive 3-question set', () => {
+    for (const path of ['easier', 'medium', 'harder'] as const) for (let f = 1; f <= 8; f++) {
+      const s2 = buildSection(2, path, f, new Set());
+      const idx = s2.map((q, i) => (q.setId ? i : -1)).filter((i) => i >= 0);
+      expect(idx).toHaveLength(3);
+      expect(idx[2] - idx[0]).toBe(2);
+      expect(new Set(idx.map((i) => s2[i].setId)).size).toBe(1);
+      expect(idx.map((i) => s2[i].setIndex)).toEqual([0, 1, 2]);
+    }
+  });
+  it('practice serves a set member together with its siblings, in order', () => {
+    const qs = pickQuestions({ units: ['da.interpretation'], levels: [4] }, 12, { qstats: new Map(), ratings: {}, mastery: {}, recent: [] }, { seed: 9 });
+    const withSet = qs.filter((q) => q.setId);
+    expect(withSet.length).toBeGreaterThan(0);
+    for (const id of new Set(withSet.map((q) => q.setId))) {
+      const members = qs.filter((q) => q.setId === id);
+      if (members.length === 3) expect(members.map((q) => q.setIndex)).toEqual([0, 1, 2]);
+    }
   });
 });

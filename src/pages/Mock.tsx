@@ -13,6 +13,7 @@ import { Feedback } from '../components/Feedback';
 import { Calculator } from '../components/Calculator';
 import { Card, PageHead, Stat, fmtTime, pctStr, uid } from '../components/ui';
 import { LineSeries } from '../components/Charts';
+import { TimingStrategy } from '../components/TimingStrategy';
 import { useStore } from '../store/store';
 
 const LIMITS = [21 * 60, 26 * 60];
@@ -242,6 +243,7 @@ function Results({ r, onAgain }: { r: ExamResult; onAgain: () => void }) {
           </Card>
         ))}
       </div>
+      <TimingStrategy r={r} />
       <div className="grid g3 mt16">
         {[{ t: 'By topic', rows: grp((x) => CATEGORY_BY_ID[x.q.category].name) }, { t: 'By question type', rows: grp((x) => (x.q.di ? FORMAT_NAMES.di : FORMAT_NAMES[x.q.format])) }, { t: 'By difficulty', rows: grp((x) => `${x.q.level}. ${LEVEL_NAMES[x.q.level]}`).sort() }].map((g) => (
           <Card key={g.t} title={g.t}>

@@ -95,3 +95,16 @@ describe('persistent store', () => {
     expect(await S().loadSnapshot('mock')).toBeNull();
   });
 });
+
+describe('official scores', () => {
+  it('records the model estimate at entry time and calibrates derived estimates', async () => {
+    const before = computeDerived(S()).estimate.score!;
+    await S().addOfficialScore({ date: '2026-11-20', score: Math.min(170, before + 10), source: 'POWERPREP Online' });
+    const o = S().profile.officialScores.at(-1)!;
+    expect(o.modelScore).toBe(before);
+    const after = computeDerived(S()).estimate.score!;
+    expect(after).toBeGreaterThan(before);
+    await S().removeOfficialScore(o.id);
+    expect(computeDerived(S()).estimate.score).toBe(before);
+  });
+});

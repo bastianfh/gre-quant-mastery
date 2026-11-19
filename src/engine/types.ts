@@ -91,6 +91,10 @@ export interface Question {
   concepts: string[];
   diagram?: Diagram;
   source: 'bank' | 'variant' | 'ai';
+  /** Shared-data set membership (data-interpretation sets). */
+  setId?: string;
+  setIndex?: number;
+  setSize?: number;
 }
 
 export type UserAnswer = number | number[] | string | null; // string for numeric entry ("3.5" or "7/8")
@@ -115,6 +119,8 @@ export interface Generator {
   concepts: string[];
   /** Boss challenge tag, e.g. 'geometry+ratios'. */
   combo?: string;
+  /** Member of a shared-data set (e.g. three questions on one chart): members share the base's seed. */
+  setOf?: { base: string; index: number; size: number };
   generate: (rng: import('../lib/rng').RNG, level: Level) => GenOutput;
 }
 
@@ -217,6 +223,7 @@ export interface Profile {
   flagged: string[];
   formulaBookmarks: string[];
   reports: { qid: string; note: string; ts: number }[];
+  officialScores: import('./scoring').OfficialScore[];
   ratings: Record<string, number>; // Elo per unit + '_global'
   diagnosticDone: boolean;
   settings: {

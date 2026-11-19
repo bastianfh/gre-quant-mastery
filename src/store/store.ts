@@ -16,7 +16,7 @@ export function defaultProfile(): Profile {
   return {
     id: 'me', name: 'Candidate', targetScore: 167, examDate: addDays(today, 30), startDate: today,
     dailyMinutes: 75, dailyQuestionGoal: 30, xp: 0, achievements: {}, lessonsCompleted: {}, lessonMastery: {},
-    bookmarks: [], flagged: [], formulaBookmarks: [], reports: [], ratings: {}, diagnosticDone: false,
+    bookmarks: [], flagged: [], formulaBookmarks: [], reports: [], officialScores: [], ratings: {}, diagnosticDone: false,
     settings: { feedback: 'immediate', showTimer: true, sound: false, reduceMotion: false, confidencePrompt: false, theme: 'dark' },
     createdAt: Date.now(), version: SCHEMA_VERSION,
   };
@@ -60,6 +60,8 @@ interface State {
   markPlanBlock: (blockId: string) => Promise<void>;
   claimObjective: (id: string) => Promise<void>;
   saveAiQuestion: (q: Question) => Promise<void>;
+  addOfficialScore: (o: { date: string; score: number; source: string }) => Promise<void>;
+  removeOfficialScore: (id: string) => Promise<void>;
   addXp: (xp: number, why?: string) => Promise<void>;
   pushToast: (t: Omit<Toast, 'id'>) => void;
   dismissToast: (id: number) => void;
@@ -269,6 +271,14 @@ export const useStore = create<State>((set, get) => {
       await gainXp(XP_EVENTS.objective);
       get().pushToast({ kind: 'xp', text: `+${XP_EVENTS.objective} XP`, sub: 'Daily objective complete' });
     },
+    async addOfficialScore(o) {
+      const s = get();
+      // remember what the model predicted at this moment (uncalibrated), so the gap can calibrate future estimates
+      const d = computeDerived({ ...s, profile: { officialScores: [] } } as any);
+      const entry = { id: `off-${Date.now()}`, ts: Date.now(), date: o.date, score: Math.round(o.score), source: o.source || 'Official practice test', modelScore: d.estimate.score };
+      await saveProfile({ ...s.profile, officialScores: [...(s.profile.officialScores ?? []), entry] });
+    },
+    async removeOfficialScore(id) { const p = get().profile; await saveProfile({ ...p, officialScores: (p.officialScores ?? []).filter((x) => x.id !== id) }); },
     async saveAiQuestion(q) { registerExtra(q); await safe(db.aiQuestions.put(q), fail); bump(); },
     async addXp(xp, why) { await gainXp(xp); if (why) get().pushToast({ kind: 'xp', text: `+${xp} XP`, sub: why }); },
 

@@ -7,6 +7,8 @@ import { BandTag, Card, Empty, PageHead, Stat, fmtTime, pctStr, usePalette } fro
 import { Bars, LineSeries } from '../components/Charts';
 import { useStore } from '../store/store';
 import { useDerived } from '../store/hooks';
+import { OfficialScores } from '../components/OfficialScores';
+import { ExamTimingSummary } from '../components/TimingStrategy';
 
 type Tab = 'overview' | 'topics' | 'time' | 'errors' | 'progress' | 'history';
 
@@ -36,7 +38,7 @@ export default function Analytics() {
     return row;
   }), [days.length, at.length]); // eslint-disable-line
 
-  if (!s.attempts.length) return (<div className="fade-in"><PageHead title="Analytics" sub="Everything here is computed from your recorded answers." /><Card><Empty title="No data yet">Answer some questions — every chart on this page is built from your real attempts.</Empty></Card></div>);
+  if (!s.attempts.length) return (<div className="fade-in"><PageHead title="Analytics" sub="Everything here is computed from your recorded answers." /><Card><Empty title="No data yet">Answer some questions — every chart on this page is built from your real attempts.</Empty></Card><div className="mt16"><OfficialScores /></div></div>);
 
   const tabs: [Tab, string][] = [['overview', 'Overview'], ['topics', 'Topics'], ['time', 'Time'], ['errors', 'Errors'], ['progress', 'Progress'], ['history', 'History']];
   const slowest = unitRows.filter((r) => r.n >= 3 && r.time !== null).sort((a, b) => (b.time! / b.u.id.length) - (a.time! / a.u.id.length));
@@ -72,6 +74,7 @@ export default function Analytics() {
             </Card>
           </div>
           <Card title="Estimated score development" className="mt16">{days.filter((r) => r.est).length < 2 ? <div className="small muted">Needs two or more active days.</div> : <LineSeries data={days.map((r) => ({ date: r.date.slice(5), Estimate: r.est }))} x="date" series={[{ key: 'Estimate', name: 'Estimated score' }]} yDomain={[130, 170]} refY={s.profile.targetScore} refLabel="target" />}</Card>
+          <div className="mt16"><OfficialScores /></div>
         </>
       )}
 
@@ -130,6 +133,7 @@ export default function Analytics() {
             <Card title="Slowest topics (time ÷ target)">{byRatio.slice(0, 6).map((r) => <div key={r.u.id} className="list-row small"><span className="grow">{r.u.name}</span><span className="mono">{fmtTime(r.time!)}</span><span className="mono muted">{r.ratio.toFixed(2)}×</span></div>)}{!byRatio.length && <div className="small muted">Needs 3+ attempts per topic.</div>}</Card>
             <Card title="Fastest topics (time ÷ target)">{[...byRatio].reverse().slice(0, 6).map((r) => <div key={r.u.id} className="list-row small"><span className="grow">{r.u.name}</span><span className="mono">{fmtTime(r.time!)}</span><span className="mono muted">{r.ratio.toFixed(2)}×</span></div>)}</Card>
           </div>
+          <div className="mt16"><ExamTimingSummary exams={s.exams} /></div>
         </>
       )}
 
