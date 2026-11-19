@@ -228,6 +228,65 @@ await mp.screenshot({ path: `${SHOTS}/13-mobile-menu.png` });
   await oc.close();
 }
 
+// 10. cloud account + sync + friends (only when the server has the sync API, e.g. wrangler dev)
+const health = await (await fetch(`${BASE}/api/health`)).json().catch(() => ({}));
+if (health.sync) {
+  const uname = `e2e_${Date.now().toString(36)}`, pw = 'e2e passphrase ok';
+  const A = await browser.newContext(), pa = await A.newPage();
+  pa.on('pageerror', (e) => errors.push(`sync A pageerror: ${e.message}`));
+  await pa.goto(`${BASE}/#/settings`); await pa.waitForTimeout(800);
+  await pa.getByRole('radio', { name: 'Create account' }).click().catch(async () => { await pa.getByText('Create account', { exact: true }).first().click(); });
+  await pa.getByTestId('account-username').fill(uname);
+  await pa.getByTestId('account-pass').fill(pw);
+  await pa.getByTestId('account-pass2').fill(pw);
+  await pa.getByTestId('account-submit').click();
+  await pa.waitForSelector('[data-testid=account-status]', { timeout: 15000 });
+  check('sync: create account', (await pa.getByTestId('account-status').innerText()).includes(uname));
+  await pa.getByLabel('Display name').fill('Synced Sam'); await pa.waitForTimeout(200);
+  await pa.getByTestId('sync-now').click();
+  await pa.waitForFunction(() => /Last synced/.test(document.querySelector('[data-testid=sync-status]')?.textContent ?? ''), null, { timeout: 15000 });
+  check('sync: first upload completes', true);
+  await pa.screenshot({ path: `${SHOTS}/16-account.png` });
+
+  const B = await browser.newContext(), pb = await B.newPage();
+  pb.on('pageerror', (e) => errors.push(`sync B pageerror: ${e.message}`));
+  await pb.goto(`${BASE}/#/settings`); await pb.waitForTimeout(800);
+  await pb.getByTestId('account-username').fill(uname);
+  await pb.getByTestId('account-pass').fill(pw);
+  await pb.getByTestId('account-submit').click();
+  await pb.waitForSelector('[data-testid=account-status]', { timeout: 15000 });
+  await pb.waitForTimeout(1200);
+  check('sync: second device receives profile', (await pb.getByLabel('Display name').inputValue()) === 'Synced Sam', await pb.getByLabel('Display name').inputValue());
+
+  // practice on device B, then sync back to A
+  await pb.goto(`${BASE}/#/practice`); await pb.waitForTimeout(500);
+  await pb.getByTestId('start-practice').click(); await pb.waitForTimeout(400);
+  const choicesB = pb.locator('.q-card .choice:not([disabled])');
+  if (await choicesB.count()) await choicesB.first().click(); else await pb.locator('.q-card .numeric-entry input').first().fill('3');
+  await pb.getByTestId('submit').click(); await pb.waitForTimeout(300);
+  const nB = await pb.evaluate(() => new Promise((res) => { const r = indexedDB.open('gre-quant-mastery'); r.onsuccess = () => { const t = r.result.transaction('attempts').objectStore('attempts').count(); t.onsuccess = () => res(t.result); }; }));
+  await pb.goto(`${BASE}/#/settings`); await pb.waitForTimeout(500);
+  await pb.getByTestId('sync-now').click();
+  await pb.waitForFunction(() => /Last synced/.test(document.querySelector('[data-testid=sync-status]')?.textContent ?? ''), null, { timeout: 15000 });
+  await pa.getByTestId('sync-now').click(); await pa.waitForTimeout(2500);
+  const nA = await pa.evaluate(() => new Promise((res) => { const r = indexedDB.open('gre-quant-mastery'); r.onsuccess = () => { const t = r.result.transaction('attempts').objectStore('attempts').count(); t.onsuccess = () => res(t.result); }; }));
+  check('sync: attempts made on device B reach device A', nA === nB && nB >= 1, `A=${nA} B=${nB}`);
+
+  // friends: a second user (via API) who shares a score, added by code in the UI
+  const bob = await (await fetch(`${BASE}/api/auth/signup`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username: `${uname}_bob`, passphrase: 'bob e2e passphrase' }) })).json();
+  const auth = { authorization: `Bearer ${bob.token}`, 'content-type': 'application/json' };
+  await fetch(`${BASE}/api/me`, { method: 'POST', headers: auth, body: JSON.stringify({ share: true }) });
+  const d = new Date(); const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  await fetch(`${BASE}/api/scores`, { method: 'POST', headers: auth, body: JSON.stringify({ day, points: 321, correct: 8, total: 12 }) });
+  await pa.goto(`${BASE}/#/friends`); await pa.waitForTimeout(1200);
+  await pa.getByTestId('friend-input').fill(bob.user.friendCode);
+  await pa.getByRole('button', { name: 'Add' }).click(); await pa.waitForTimeout(1500);
+  const board = await pa.getByTestId('board-today').innerText();
+  check('friends: added friend appears with their score', board.includes(`${uname}_bob`) && board.includes('321'), board.replace(/\s+/g, ' '));
+  await pa.screenshot({ path: `${SHOTS}/17-friends.png` });
+  await A.close(); await B.close();
+} else check('sync section skipped (server has no sync API)', true);
+
 check('no console/page errors', errors.length === 0, errors.slice(0, 8).join(' | '));
 await browser.close();
 const failed = results.filter((r) => !r.ok);

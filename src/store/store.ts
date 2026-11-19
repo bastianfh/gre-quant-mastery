@@ -155,8 +155,9 @@ export const useStore = create<State>((set, get) => {
       }
     },
 
-    async updateProfile(p) { await saveProfile({ ...get().profile, ...p }); },
-    async updateSettings(st) { await saveProfile({ ...get().profile, settings: { ...get().profile.settings, ...st } }); },
+    // user-edited fields carry editedAt so cross-device sync knows which side's choices are newer
+    async updateProfile(p) { await saveProfile({ ...get().profile, ...p, editedAt: Date.now() }); },
+    async updateSettings(st) { await saveProfile({ ...get().profile, settings: { ...get().profile.settings, ...st }, editedAt: Date.now() }); },
 
     async recordAttempt(r) {
       const s = get();

@@ -8,6 +8,7 @@ import { ACHIEVEMENTS, LEVELS, levelOf } from '../engine/gamification';
 import { validateQuestion } from '../engine/validate';
 import type { Question } from '../engine/types';
 import { InstallApp } from '../components/InstallApp';
+import { AccountCard } from '../components/AccountCard';
 
 export default function Settings() {
   const s = useStore();
@@ -45,6 +46,7 @@ export default function Settings() {
     <div className="fade-in">
       <PageHead title="Settings" sub="Exam details, study preferences, data management and AI configuration." />
       <div className="grid g2">
+        <AccountCard />
         <Card title="Exam & goals">
           <div className="grid g2">
             <label className="field">Exam date<input type="date" value={p.examDate} onChange={(e) => s.updateProfile({ examDate: e.target.value })} /></label>

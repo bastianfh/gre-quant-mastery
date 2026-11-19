@@ -236,6 +236,7 @@ export interface Profile {
   };
   createdAt: number;
   version: number;
+  editedAt?: number;         // last time the user edited settings/goals (sync conflict resolution)
 }
 
 export interface DailyLog {

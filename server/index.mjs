@@ -165,7 +165,7 @@ const UNIT_CATEGORY = { ar: 'arithmetic', al: 'algebra', wp: 'word', ge: 'geomet
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', 'http://x');
   try {
-    if (url.pathname === '/api/health') return send(res, 200, { ok: true, ai: AI_ENABLED, model: AI_ENABLED ? MODEL : undefined, reason: AI_ENABLED ? undefined : 'Server running without ANTHROPIC_API_KEY.' });
+    if (url.pathname === '/api/health') return send(res, 200, { ok: true, ai: AI_ENABLED, model: AI_ENABLED ? MODEL : undefined, reason: AI_ENABLED ? undefined : 'Server running without ANTHROPIC_API_KEY.', sync: false });
     if (url.pathname === '/api/tutor' && req.method === 'POST') {
       if (!client) return send(res, 503, { error: 'AI tutor not configured (set ANTHROPIC_API_KEY on the server).' });
       return send(res, 200, { text: await tutor(await readJson(req)) });

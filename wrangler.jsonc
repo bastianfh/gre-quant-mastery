@@ -3,10 +3,18 @@
 	// Must match the Worker's name in the Cloudflare dashboard.
 	"name": "gre-quant-mastery",
 	"compatibility_date": "2026-11-19",
-	// Static-assets-only Worker: serves the Vite build output. The app runs fully in the browser;
-	// /api/* is not served here, so the app falls back to its built-in offline tutor.
+	// Only /api/* runs the Worker (accounts, progress sync, friends leaderboard).
+	// Everything else is served straight from the Vite build output.
+	"main": "worker/index.ts",
 	"assets": {
 		"directory": "./dist/",
-		"not_found_handling": "single-page-application"
-	}
+		"not_found_handling": "single-page-application",
+		"run_worker_first": ["/api/*"]
+	},
+	// No database_id on purpose: Cloudflare creates the D1 database automatically on the
+	// first deploy (automatic provisioning). The Worker creates its tables on first use.
+	"d1_databases": [
+		{ "binding": "DB" }
+	],
+	"observability": { "enabled": true }
 }

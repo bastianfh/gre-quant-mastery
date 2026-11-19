@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { HashRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Target, CalendarCheck, Gauge, Scale, Swords, FlaskConical, ClipboardCheck, BarChart3, Sigma, Settings as SettingsIcon, Menu, Flame, Zap, CalendarDays, Map, Brain } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Target, CalendarCheck, Gauge, Scale, Swords, FlaskConical, ClipboardCheck, BarChart3, Sigma, Settings as SettingsIcon, Menu, Flame, Zap, CalendarDays, Map, Brain, Users } from 'lucide-react';
 import { useStore } from './store/store';
 import { computeDerived } from './store/derived';
 import { levelOf, dayKey, daysBetween } from './engine/gamification';
@@ -22,6 +22,7 @@ const Formulas = lazy(() => import('./pages/Formulas'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Plan = lazy(() => import('./pages/Plan'));
 const Drills = lazy(() => import('./pages/Drills'));
+const Friends = lazy(() => import('./pages/Friends'));
 
 type NavEntry = { to: string; label: string; icon: typeof LayoutDashboard; end?: boolean; badge?: boolean };
 const NAV_GROUPS: { title: string; items: NavEntry[] }[] = [
@@ -45,6 +46,7 @@ const NAV_GROUPS: { title: string; items: NavEntry[] }[] = [
     { to: '/lab', label: 'Wrong Answer Lab', icon: FlaskConical, badge: true },
     { to: '/mock', label: 'Mock Exams', icon: ClipboardCheck },
     { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/friends', label: 'Friends', icon: Users },
   ] },
 ];
 
@@ -128,6 +130,7 @@ function Shell() {
                 <Route path="/daily" element={<Daily />} />
                 <Route path="/speed" element={<Speed />} />
                 <Route path="/drills" element={<Drills />} />
+                <Route path="/friends" element={<Friends />} />
                 <Route path="/qc" element={<QcArena />} />
                 <Route path="/boss" element={<Boss />} />
                 <Route path="/lab" element={<Lab />} />
