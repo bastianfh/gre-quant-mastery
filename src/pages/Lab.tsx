@@ -9,7 +9,7 @@ import { SessionRunner } from '../components/SessionRunner';
 import { QuestionView } from '../components/QuestionView';
 import { Feedback } from '../components/Feedback';
 import { Card, Empty, PageHead, Seg, Stat } from '../components/ui';
-import { Bars } from '../components/Charts';
+import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { useDerived } from '../store/hooks';
 

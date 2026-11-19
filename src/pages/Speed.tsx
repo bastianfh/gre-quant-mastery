@@ -6,7 +6,7 @@ import { quadrant, QUADRANT_ADVICE } from '../engine/adaptive';
 import { XP_EVENTS } from '../engine/gamification';
 import { SessionRunner } from '../components/SessionRunner';
 import { Card, PageHead, Seg, pctStr } from '../components/ui';
-import { Bars } from '../components/Charts';
+import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { usePickCtx, useDerived } from '../store/hooks';
 import type { Level } from '../engine/types';

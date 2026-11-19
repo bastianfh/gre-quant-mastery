@@ -4,7 +4,7 @@ import { computeMastery } from '../engine/mastery';
 import { ERROR_TYPE_NAMES, FORMAT_NAMES, LEVEL_NAMES, type Attempt, type Level } from '../engine/types';
 import { dayKey } from '../engine/gamification';
 import { BandTag, Card, Empty, PageHead, Stat, fmtTime, pctStr, usePalette } from '../components/ui';
-import { Bars, LineSeries } from '../components/Charts';
+import { Bars, LineSeries } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { useDerived } from '../store/hooks';
 import { OfficialScores } from '../components/OfficialScores';

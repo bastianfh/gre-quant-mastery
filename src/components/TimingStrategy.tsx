@@ -4,7 +4,7 @@ import { analyzeTiming } from '../engine/timing';
 import { getQuestion } from '../engine/bank';
 import { UNIT_BY_ID } from '../content/curriculum';
 import { answerIsBlank } from './QuestionView';
-import { LineSeries } from './Charts';
+import { LineSeries } from './LazyCharts';
 import { Card, fmtTime, pctStr } from './ui';
 
 /** Where the clock went in one simulated exam, and what it cost. */

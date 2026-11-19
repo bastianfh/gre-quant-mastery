@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { contentSignature, gunzipJson, gzipJson, mergeExports, type ExportData } from '../src/engine/merge';
 import { defaultProfile } from '../src/store/store';
-import type { Attempt, DailyLog, SessionResult, SrsItem } from '../src/engine/types';
+import type { Attempt, DailyLog, Profile, SessionResult, SrsItem } from '../src/engine/types';
 
 const att = (qid: string, ts: number, correct = true, sessionId = 's'): Attempt => ({ qid, generatorId: qid.split('~')[0], unit: 'ar.percents', category: 'arithmetic', format: 'mcq', di: false, level: 3, mode: 'practice', correct, skipped: false, timeMs: 30000, targetSec: 90, answer: { kind: 'mcq', choice: 0 } as any, ts, hintsUsed: 0, sessionId });
 const log = (date: string, q: number, extra: Partial<DailyLog> = {}): DailyLog => ({ date, questions: q, correct: Math.floor(q / 2), timeMs: q * 1000, xp: q * 5, reviews: 0, speedDrills: 0, modes: { practice: q }, planDone: {}, objectivesClaimed: [], ...extra });
 const srs = (qid: string, stage: number, lastReviewed?: number): SrsItem => ({ qid, generatorId: 'g', unit: 'u', stage, due: 1e13, lapses: 0, missCount: 1, createdAt: 1000, lastReviewed, graduated: false });
 const sess = (id: string, ts: number): SessionResult => ({ id, mode: 'practice', ts, total: 10, correct: 7 });
 
-function exp(over: Partial<ExportData> & { profile?: any } = {}): ExportData {
+function exp(over: Omit<Partial<ExportData>, 'profile'> & { profile?: Partial<Profile> } = {}): ExportData {
   return { app: 'gre-quant-mastery', schema: 1, profile: { ...defaultProfile(), ...(over.profile ?? {}) }, attempts: [], srs: [], exams: [], sessions: [], daily: [], aiQuestions: [], ...over, ...(over.profile ? { profile: { ...defaultProfile(), ...over.profile } } : {}) } as ExportData;
 }
 

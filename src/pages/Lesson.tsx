@@ -52,7 +52,7 @@ export default function LessonPage() {
       {lesson.concepts.map((c) => <div key={c.title} className="concept"><b>{c.title}.</b> <Md text={c.body} /></div>)}
 
       <h2>2 · Key formulas</h2>
-      <Card className="tight">{lesson.formulas.map((f) => <div key={f.label} className="formula-row"><span className="small ink2" style={{ width: 200, flex: 'none' }}>{f.label}</span><div className="tex"><Md text={`$${f.tex}$`} /></div></div>)}</Card>
+      <Card className="tight">{lesson.formulas.map((f) => <div key={f.label} className="formula-row"><span className="small ink2" style={{ width: 200, flex: 'none' }}>{f.label}</span><div className="tex" tabIndex={0} role="group" aria-label={f.label}><Md text={`$${f.tex}$`} /></div></div>)}</Card>
 
       <h2>3 · Rules to remember</h2>
       <ul style={{ lineHeight: 1.8, paddingLeft: 18 }}>{lesson.rules.map((r) => <li key={r}><Md text={r} /></li>)}</ul>

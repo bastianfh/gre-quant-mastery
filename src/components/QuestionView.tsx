@@ -16,8 +16,8 @@ export function QuestionView({ q, answer, onAnswer, locked, reveal, autoFocus = 
           {q.qc!.given && <div className="qc-given"><Md text={q.qc!.given} /></div>}
           {q.diagram && <Diagram d={q.diagram} />}
           <div className="qc-table" role="table" aria-label="Quantities">
-            <div className="qh">Quantity A</div><div className="qh">Quantity B</div>
-            <div><Md text={q.qc!.a} /></div><div><Md text={q.qc!.b} /></div>
+            <div className="qc-row" role="row"><div className="qh" role="columnheader">Quantity A</div><div className="qh" role="columnheader">Quantity B</div></div>
+            <div className="qc-row" role="row"><div role="cell"><Md text={q.qc!.a} /></div><div role="cell"><Md text={q.qc!.b} /></div></div>
           </div>
           <div className="small muted">Compare Quantity A and Quantity B, using additional information centered above the two quantities if such information is given.</div>
         </>

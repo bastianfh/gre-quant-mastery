@@ -6,7 +6,7 @@ import { planForDay } from '../engine/plan';
 import { CATEGORIES, MAIN_CATEGORIES, UNIT_BY_ID, CATEGORY_BY_ID } from '../content/curriculum';
 import { dailyObjectives, dayKey, daysBetween, ACHIEVEMENTS } from '../engine/gamification';
 import { BandTag, Card, Progress, fmtTime, pctStr, usePalette } from '../components/ui';
-import { LineSeries } from '../components/Charts';
+import { LineSeries } from '../components/LazyCharts';
 
 export default function Dashboard() {
   const s = useStore();

@@ -7,7 +7,7 @@ import { addDays, dayKey, XP_EVENTS } from '../engine/gamification';
 import type { Level, Question } from '../engine/types';
 import { SessionRunner, type SessionSummary } from '../components/SessionRunner';
 import { Card, PageHead, Stat } from '../components/ui';
-import { Bars } from '../components/Charts';
+import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { usePickCtx, useDerived } from '../store/hooks';
 import { UNIT_BY_ID } from '../content/curriculum';

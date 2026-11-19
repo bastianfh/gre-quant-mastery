@@ -33,7 +33,7 @@ export default function Formulas() {
             <Card key={sec.id} title={sec.title}>
               {items.map((f) => (
                 <div key={f.id} className="formula-row">
-                  <div className="tex"><div className="small ink2 mb8">{f.name}</div><Md text={`$${f.tex}$`} />{f.note && <div className="tiny muted mt8">{f.note}</div>}</div>
+                  <div className="tex" tabIndex={0} role="group" aria-label={f.name}><div className="small ink2 mb8">{f.name}</div><Md text={`$${f.tex}$`} />{f.note && <div className="tiny muted mt8">{f.note}</div>}</div>
                   <button className="btn ghost icon sm" aria-label={marks.includes(f.id) ? 'Remove bookmark' : 'Bookmark'} onClick={() => s.toggleList('formulaBookmarks', f.id)}><Star size={15} fill={marks.includes(f.id) ? 'var(--warning)' : 'none'} color={marks.includes(f.id) ? 'var(--warning)' : 'currentColor'} /></button>
                 </div>
               ))}

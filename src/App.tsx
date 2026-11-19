@@ -106,7 +106,8 @@ function Shell() {
           <NavLink to="/settings" className={({ isActive }) => `nav-item mt8 ${isActive ? 'active' : ''}`}><SettingsIcon size={16} /> Settings</NavLink>
         </aside>
 
-        <main className="app-main" ref={mainRef}>
+        {/* while the mobile drawer is open, the page behind it is inert (no focus, hidden from screen readers) */}
+        <main className="app-main" ref={mainRef} {...(open ? { inert: '', 'aria-hidden': true } : {})}>
           <header className="topbar">
             <button className="btn icon ghost menu-btn" onClick={() => setOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
             <div className="ticker">

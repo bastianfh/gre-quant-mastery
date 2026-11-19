@@ -39,10 +39,10 @@
   --border-strong: rgba(11, 11, 11, 0.18);
   --ink: #0b0b0b;
   --ink-2: #52514e;
-  --muted: #6f6d68;
+  --muted: #65635e;
   --grid: #e1e0d9;
   --axis: #c3c2b7;
-  --accent: #2a78d6;
+  --accent: #1f64b8; /* 5.2:1 on the light canvas (WCAG AA) */
   --accent-soft: rgba(42, 120, 214, 0.1);
   --good-ink: #006300;
   --critical-ink: #b52b2b;
@@ -159,8 +159,8 @@ table.data tr:hover td { background: var(--surface-2); }
 .q-stem { font-size: 16px; line-height: 1.7; }
 .q-stem .katex { font-size: 1.08em; }
 .qc-table { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); margin: 14px 0 18px; overflow: hidden; }
-.qc-table > div { padding: 14px 16px; text-align: center; font-size: 16px; }
-.qc-table > div + div { border-left: 1px solid var(--border-strong); }
+.qc-table > .qc-row > div { padding: 14px 16px; text-align: center; font-size: 16px; }
+.qc-table > .qc-row > div + div { border-left: 1px solid var(--border-strong); }
 .qc-table .qh { background: var(--surface-2); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 8px; }
 .qc-given { text-align: center; margin: 8px 0 4px; font-size: 16px; }
 .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }

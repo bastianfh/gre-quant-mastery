@@ -12,7 +12,7 @@ import { QuestionView, answerIsBlank } from '../components/QuestionView';
 import { Feedback } from '../components/Feedback';
 import { Calculator } from '../components/Calculator';
 import { Card, PageHead, Stat, fmtTime, pctStr, uid } from '../components/ui';
-import { LineSeries } from '../components/Charts';
+import { LineSeries } from '../components/LazyCharts';
 import { TimingStrategy } from '../components/TimingStrategy';
 import { useStore } from '../store/store';
 

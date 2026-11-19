@@ -55,7 +55,21 @@ export default defineConfig({
     host: true,
     proxy: { '/api': 'http://localhost:8787' },
   },
-  build: { chunkSizeWarningLimit: 2000 },
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        // stable vendor chunks: app deploys don't invalidate cached libraries
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/](react|react-dom|scheduler|react-router|react-router-dom|@remix-run)[\\/]/.test(id)) return 'vendor-react';
+          if (id.includes('/katex/')) return 'vendor-katex';
+          if (id.includes('/dexie/')) return 'vendor-dexie';
+          return undefined; // recharts & friends follow the lazy chart chunk
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'node',

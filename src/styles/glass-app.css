@@ -195,3 +195,5 @@ input, select, textarea { border-radius: 12px; }
 /* ----- friends ----- */
 .friend-code { font-size: 20px; font-weight: 700; letter-spacing: 0.12em; }
 .me-row td { background: var(--accent-soft); }
+.chart-loading { border-radius: 12px; background: var(--surface-2); opacity: 0.5; }
+.qc-row { display: contents; }

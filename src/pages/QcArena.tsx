@@ -5,7 +5,7 @@ import { pickQuestions } from '../engine/selection';
 import { computeMastery } from '../engine/mastery';
 import { SessionRunner } from '../components/SessionRunner';
 import { BandTag, Card, PageHead, Seg, Stat, fmtTime, pctStr } from '../components/ui';
-import { Bars } from '../components/Charts';
+import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { usePickCtx } from '../store/hooks';
 import { MAIN_CATEGORIES, CATEGORY_BY_ID } from '../content/curriculum';
