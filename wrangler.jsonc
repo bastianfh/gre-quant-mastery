@@ -1,0 +1,12 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	// Must match the Worker's name in the Cloudflare dashboard.
+	"name": "gre-quant-mastery",
+	"compatibility_date": "2026-11-19",
+	// Static-assets-only Worker: serves the Vite build output. The app runs fully in the browser;
+	// /api/* is not served here, so the app falls back to its built-in offline tutor.
+	"assets": {
+		"directory": "./dist/",
+		"not_found_handling": "single-page-application"
+	}
+}

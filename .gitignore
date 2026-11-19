@@ -5,3 +5,4 @@ dist
 e2e-shots
 question-bank.json
 *.zip
+.wrangler
