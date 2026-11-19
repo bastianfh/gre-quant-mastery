@@ -128,6 +128,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'boss', name: 'Boss Slayer', desc: 'Complete a Boss Challenge.', icon: 'swords', test: (s) => doneMode(s, 'boss') },
   { id: 'daily', name: 'Daily Grinder', desc: 'Complete a Daily Challenge.', icon: 'calendar', test: (s) => doneMode(s, 'daily') },
   { id: 'lessons5', name: 'Scholar', desc: 'Complete 5 lessons.', icon: 'graduation', test: (s) => s.lessonsCompleted >= 5 },
+  { id: 'mental25', name: 'Human Calculator', desc: 'Get 25 correct in one 60-second mental-math round.', icon: 'zap', test: (s) => s.sessions.some((x) => x.mode === 'drill' && (x.score ?? 0) >= 25) },
   { id: 'qc50', name: 'Comparison Specialist', desc: 'Answer 50 Quantitative Comparison questions correctly.', icon: 'scale', test: (s) => s.attempts.filter((a) => a.format === 'qc' && a.correct).length >= 50 },
 ];
 

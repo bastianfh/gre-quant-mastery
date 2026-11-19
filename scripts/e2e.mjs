@@ -34,7 +34,7 @@ async function answerAndSubmit() {
 }
 
 // 1. every route renders
-const routes = ['/', '/plan', '/learn', '/learn/ar.percents', '/learn/ge.circles', '/practice', '/daily', '/speed', '/qc', '/boss', '/lab', '/mock', '/analytics', '/formulas', '/settings'];
+const routes = ['/', '/plan', '/learn', '/learn/ar.percents', '/learn/ge.circles', '/practice', '/daily', '/speed', '/qc', '/boss', '/lab', '/mock', '/analytics', '/formulas', '/settings', '/drills'];
 for (const r of routes) {
   await go(r);
   const txt = await page.locator('main').innerText();
@@ -126,6 +126,7 @@ await page.waitForSelector('[data-testid=exam-score]', { timeout: 15000 });
 const score = Number(await page.getByTestId('exam-score').innerText());
 check('exam produces a scaled score', score >= 130 && score <= 170, `score=${score}`);
 await shot('08-exam-results');
+check('exam results show timing strategy', (await page.getByTestId('timing-advice').count()) === 1);
 
 // 6b. interrupted-exam recovery
 await go('/'); await go('/mock'); await page.getByTestId('start-mock').click(); await page.waitForTimeout(400);
@@ -149,6 +150,41 @@ check('light theme applies', (await page.evaluate(() => document.documentElement
 await go('/'); await shot('09-dashboard-light');
 await go('/settings'); await page.getByRole('radio', { name: 'Dark', exact: true }).click();
 await go('/'); await shot('10-dashboard-data');
+
+// 7b. official score calibration
+await go('/analytics');
+await page.getByTestId('official-score-input').first().fill('158');
+await page.getByTestId('official-score-add').first().click(); await page.waitForTimeout(400);
+check('official score recorded', /calibration|first result/i.test(await page.getByTestId('calibration-status').first().innerText()), await page.getByTestId('calibration-status').first().innerText());
+
+// 7c. mental-math drill round (fake clock to finish the 60 s round instantly)
+{
+  const dp = await ctx.newPage();
+  dp.on('pageerror', (e) => errors.push(`drill pageerror: ${e.message}`));
+  await dp.clock.install();
+  await dp.goto(`${BASE}/#/drills`); await dp.waitForTimeout(500);
+  await dp.getByTestId('drill-kind-squares').click();
+  await dp.getByTestId('start-drill').click(); await dp.waitForTimeout(200);
+  let solved = 0;
+  for (let i = 0; i < 3; i++) {
+    const prompt = await dp.getByTestId('drill-prompt').innerText();
+    const ann = await dp.locator('[data-testid=drill-prompt] annotation').first().textContent().catch(() => prompt);
+    const sq = (ann ?? '').match(/^(\d+)\^2$/), rt = (ann ?? '').match(/\\sqrt\{(\d+)\}/);
+    const ans = sq ? String(Number(sq[1]) ** 2) : rt ? String(Math.round(Math.sqrt(Number(rt[1])))) : '0';
+    if (sq || rt) solved++;
+    await dp.getByTestId('drill-input').fill(ans);
+    await dp.getByTestId('drill-input').press('Enter');
+    await dp.clock.runFor(1200); await dp.waitForTimeout(100);
+  }
+  await dp.screenshot({ path: `${SHOTS}/14-drill.png` });
+  await dp.clock.runFor(61000); await dp.waitForTimeout(400);
+  const res = dp.getByTestId('drill-result');
+  check('drill round ends with a result', (await res.count()) === 1);
+  const txt = (await res.innerText().catch(() => '')).replace(/\s+/g, ' ');
+  check('drill counts correct answers', txt.startsWith(`${solved} correct`), txt);
+  await dp.screenshot({ path: `${SHOTS}/15-drill-result.png` });
+  await dp.close();
+}
 
 // 8. mobile layout
 const m = await browser.newContext({ ...devices['iPhone 13'] });

@@ -125,7 +125,7 @@ export interface Generator {
 }
 
 // ---------- Persistence records ----------
-export type Mode = 'practice' | 'learn' | 'daily' | 'speed' | 'qc' | 'boss' | 'review' | 'mock' | 'diagnostic' | 'mastery';
+export type Mode = 'practice' | 'learn' | 'daily' | 'speed' | 'qc' | 'boss' | 'review' | 'mock' | 'diagnostic' | 'mastery' | 'drill';
 
 export type ErrorType = 'concept' | 'calculation' | 'misread' | 'time' | 'strategy' | 'careless';
 export const ERROR_TYPE_NAMES: Record<ErrorType, string> = {
