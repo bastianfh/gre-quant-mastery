@@ -4,3 +4,4 @@ dist
 .env
 e2e-shots
 question-bank.json
+*.zip
