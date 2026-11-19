@@ -7,6 +7,7 @@ import { UNITS, UNIT_BY_ID } from '../content/curriculum';
 import { ACHIEVEMENTS, LEVELS, levelOf } from '../engine/gamification';
 import { validateQuestion } from '../engine/validate';
 import type { Question } from '../engine/types';
+import { InstallApp } from '../components/InstallApp';
 
 export default function Settings() {
   const s = useStore();
@@ -61,6 +62,7 @@ export default function Settings() {
             <label className="row small"><input type="checkbox" checked={p.settings.showTimer} onChange={(e) => s.updateSettings({ showTimer: e.target.checked })} /> Show timer during practice</label>
             <label className="row small"><input type="checkbox" checked={p.settings.confidencePrompt} onChange={(e) => s.updateSettings({ confidencePrompt: e.target.checked })} /> Ask for my confidence before submitting</label>
             <label className="row small"><input type="checkbox" checked={p.settings.reduceMotion} onChange={(e) => s.updateSettings({ reduceMotion: e.target.checked })} /> Reduce motion</label>
+            <InstallApp />
           </div>
         </Card>
         <Card title="Your data">

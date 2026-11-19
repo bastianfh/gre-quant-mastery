@@ -11,6 +11,9 @@ import './styles.css';
 import './styles/glass-theme.css';
 import './styles/glass-app.css';
 import App from './App';
+import { initPwa } from './lib/pwa';
+
+initPwa();
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err: Error | null }> {
   state = { err: null as Error | null };

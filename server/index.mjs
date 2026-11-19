@@ -18,7 +18,7 @@ const client = AI_ENABLED ? new Anthropic() : null;
 // Server-side refusal fallback: if the model declines, the API re-runs the request on a fallback model.
 const FALLBACK = { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' };
 
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.png': 'image/png', '.ico': 'image/x-icon' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.png': 'image/png', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' };
 
 function send(res, status, body, headers = {}) {
   const data = typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body);

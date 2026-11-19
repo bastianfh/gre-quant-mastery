@@ -205,6 +205,29 @@ await mp.locator('.app-sidebar').getByRole('link', { name: 'Analytics' }).click(
 check('mobile: tapping a menu item navigates', mp.url().endsWith('#/analytics') && (await mp.locator('.app-sidebar.open').count()) === 0, mp.url());
 await mp.screenshot({ path: `${SHOTS}/13-mobile-menu.png` });
 
+// 9. installable PWA: manifest, service worker, offline reload
+{
+  const oc = await browser.newContext();
+  const op = await oc.newPage();
+  op.on('pageerror', (e) => errors.push(`offline pageerror: ${e.message}`));
+  await op.goto(`${BASE}/#/`); await op.waitForLoadState('networkidle');
+  const manifest = await op.evaluate(async () => { const l = document.querySelector('link[rel=manifest]'); if (!l) return null; const r = await fetch(l.href); return r.ok ? r.json() : null; });
+  check('PWA: manifest with 192/512 icons', !!manifest && ['192x192', '512x512'].every((sz) => manifest.icons.some((i) => i.sizes === sz)));
+  const swOk = await op.evaluate(async () => { if (!('serviceWorker' in navigator)) return false; const r = await Promise.race([navigator.serviceWorker.ready, new Promise((res) => setTimeout(() => res(null), 10000))]); return !!r?.active; });
+  check('PWA: service worker active', swOk);
+  await op.waitForTimeout(1500); // let precache finish
+  await oc.setOffline(true);
+  await op.reload(); await op.waitForTimeout(1200);
+  const offlineTxt = await op.locator('main').innerText().catch(() => '');
+  check('PWA: app loads offline', offlineTxt.length > 50, `${offlineTxt.length} chars`);
+  await op.goto(`${BASE}/#/drills`); await op.waitForTimeout(800);
+  check('PWA: lazy route works offline', (await op.getByTestId('start-drill').count()) === 1);
+  await op.goto(`${BASE}/#/practice`); await op.waitForTimeout(800);
+  await op.getByTestId('start-practice').click(); await op.waitForTimeout(600);
+  check('PWA: questions work offline', (await op.locator('.q-card').count()) === 1);
+  await oc.close();
+}
+
 check('no console/page errors', errors.length === 0, errors.slice(0, 8).join(' | '));
 await browser.close();
 const failed = results.filter((r) => !r.ok);
