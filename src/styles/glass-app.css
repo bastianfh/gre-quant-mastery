@@ -197,3 +197,4 @@ input, select, textarea { border-radius: 12px; }
 .me-row td { background: var(--accent-soft); }
 .chart-loading { border-radius: 12px; background: var(--surface-2); opacity: 0.5; }
 .qc-row { display: contents; }
+.empty a, p a, .callout a { text-decoration: underline; text-underline-offset: 2px; }

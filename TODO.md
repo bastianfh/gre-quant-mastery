@@ -7,7 +7,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` implemented **and tested**
 - [x] Curriculum taxonomy (6 categories, 43 units)
 - [x] Core types, seeded RNG, exact fraction math
 - [x] Generators: arithmetic (34), algebra (28), word problems (14), geometry (23, SVG diagrams), data (23, DI charts), strategy & multi-concept (15)
-- [x] Bank: 1,158 validated questions + unlimited variants (`tests/bank.test.ts`)
+- [x] Bank: 1,265 validated questions + unlimited variants (`tests/bank.test.ts`)
 - [x] Grading: QC, MCQ, multi-select, numeric incl. fractions (`tests/engine.test.ts`)
 - [x] Persistence: Dexie store, autosave, recovery, export/import (`tests/store.test.ts`, E2E)
 - [x] App shell + 13 screens; question player; explanations with distractor diagnosis
@@ -39,7 +39,18 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` implemented **and tested**
 - [x] Independent-recomputation tests (`tests/independent.test.ts`)
 - [x] README, PROJECT_STATUS.md
 
+## Milestone 5 — Extensions
+- [x] Score calibration from official POWERPREP results (shrunken offset, capped ±12)
+- [x] Timing-strategy analytics (time sinks, pacing by section, over-cap misses)
+- [x] Shared-chart data-interpretation sets (bar/table/line/pie × 3 questions; one per mock section 2)
+- [x] 12 Expert multi-concept generators with varied wording (brute-force verified)
+- [x] Mental-math drills (7 types, 60-second rounds)
+- [x] Installable PWA + offline (service worker, manifest, icons)
+- [x] Simple sign-in + cross-device sync (Worker + D1, client-side merge)
+- [x] Friends leaderboard (friend codes, opt-in sharing, today/7-day)
+- [x] Bundle splitting + axe-core accessibility audit (0 violations)
+
 ## Possible future work
 - [ ] Live verification of the Claude endpoints with an API key
-- [ ] Cloud sync of progress
-- [ ] More hand-crafted Expert-level multi-concept items
+- [ ] Tombstones for deletions in sync (bookmarks, official scores)
+- [ ] Optional passphrase change / recovery codes

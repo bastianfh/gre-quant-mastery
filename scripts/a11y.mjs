@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const BASE = process.argv[2] ?? 'http://localhost:8787';
 const routes = ['/', '/plan', '/learn', '/learn/ar.percents', '/practice', '/daily', '/speed', '/drills', '/qc', '/boss', '/lab', '/mock', '/analytics', '/formulas', '/settings', '/friends'];
+setTimeout(() => { console.error('a11y audit timed out'); process.exit(2); }, 8 * 60 * 1000).unref();
 const browser = await chromium.launch();
 let total = 0;
 const seen = new Map();
@@ -14,7 +15,22 @@ for (const theme of ['dark', 'light']) {
   const ctx = await browser.newContext({ viewport: { width: 1360, height: 900 }, colorScheme: theme });
   const page = await ctx.newPage();
   await page.goto(`${BASE}/#/`); await page.waitForTimeout(600);
-  await page.evaluate((t) => new Promise((res) => { const r = indexedDB.open('gre-quant-mastery'); r.onsuccess = () => { const tx = r.result.transaction('profile', 'readwrite'); const st = tx.objectStore('profile'); const g = st.get('me'); g.onsuccess = () => { const p = g.result; if (p) { p.settings.theme = t; st.put(p); } }; tx.oncomplete = res; }; }), theme);
+  await page.waitForSelector('.app-shell', { timeout: 15000 });
+  // switch the app theme directly in IndexedDB; always settles (and closes the connection) so it can't hang
+  await page.evaluate((t) => new Promise((res) => {
+    const done = (db) => { try { db?.close(); } catch { /* ignore */ } res(); };
+    setTimeout(() => res(), 5000);
+    const r = indexedDB.open('gre-quant-mastery');
+    r.onerror = () => res();
+    r.onsuccess = () => {
+      const db = r.result;
+      try {
+        const tx = db.transaction('profile', 'readwrite'); const st = tx.objectStore('profile'); const g = st.get('me');
+        g.onsuccess = () => { const p = g.result; if (p) { p.settings.theme = t; st.put(p); } };
+        tx.oncomplete = () => done(db); tx.onerror = () => done(db);
+      } catch { done(db); }
+    };
+  }), theme);
   const audit = async (label) => {
     await page.addScriptTag({ content: AXE });
     const r = await page.evaluate(() => window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] }, resultTypes: ['violations'] }));

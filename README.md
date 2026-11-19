@@ -2,9 +2,11 @@
 
 An adaptive, gamified training system for the **current (shorter) GRE Quantitative Reasoning** section, built around a 30-day plan toward 165–170.
 
-- **1,158 validated questions** in a fixed bank (137 parametric generators × 5 difficulty levels), plus **unlimited fresh variants** of every concept.
+- **1,265 validated questions** in a fixed bank (161 parametric generators × 5 difficulty levels), plus **unlimited fresh variants** of every concept — including GRE-style **data-interpretation sets** (one chart, three questions) and **Expert multi-concept** items with varied wording.
 - Every answer is **computed by code**, every question is **validated automatically**, and Quantitative Comparison answers are determined by **exhaustive edge-case testing** (zero, ±1, negatives, fractions, boundaries) — never from one example.
 - Full section-adaptive **mock exams** (12 q / 21 min → 15 q / 26 min), **Wrong Answer Lab** with spaced repetition, transparent **mastery model**, **score estimate**, analytics, lessons for all 43 curriculum units, formula reference, calculator, XP/levels/achievements, and an AI tutor (offline built-in; Claude when configured).
+- **Score calibration** from your official POWERPREP results, **timing-strategy** analytics on every mock, and **60-second mental-math drills**.
+- **Installable app** that works fully **offline**; optional **account** (username + passphrase, no email) for **cross-device sync** and a **friends leaderboard** on the Cloudflare deployment.
 
 Original GRE-style content — not ETS material. Score estimates are approximations, not official ETS scores.
 
@@ -34,6 +36,29 @@ Development mode (hot reload; the `/api` calls proxy to the server on 8787):
 npm run dev
 ```
 
+### Deploying on Cloudflare (accounts, sync, friends leaderboard)
+
+The repo is a Cloudflare Worker with static assets (`wrangler.jsonc`): the Vite build is served as static files and only `/api/` routes run `worker/index.ts`. Connect the GitHub repo in the Cloudflare dashboard (Workers & Pages → Create → Import a repository) with:
+
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy`
+
+Nothing else to set up: the D1 database (binding `DB`) is **created automatically on the first deploy** because `wrangler.jsonc` lists it without an id, and the Worker creates its tables on the first request. Every push to `main` redeploys. To find the database later: dashboard → Storage & Databases → D1 (named after the Worker).
+
+Local test of the full Cloudflare setup (static site + Worker + local D1):
+
+```bash
+npm run build
+```
+
+```bash
+npm run dev:worker
+```
+
+Then open http://localhost:8788 and, in another terminal, `npm run test:api -- http://localhost:8788` (34 API checks) or `node scripts/e2e.mjs http://localhost:8788` (includes the two-device sync test).
+
+Security notes: passphrases are salted and hashed with PBKDF2 (iterations are stored per user so they can be raised; the default is tuned for the free plan's CPU limit), five wrong passphrases lock the account with exponential back-off, sign-up is capped per network per day, and session tokens are stored only as SHA-256 hashes. No email or personal data is collected, so there is no password reset — users should keep their passphrase in a password manager. Deleting the account (Settings) removes all cloud data.
+
 ### Optional: enable the Claude AI tutor & verified question generator
 
 ```bash
@@ -59,7 +84,11 @@ npm test
 npm run e2e
 ```
 
-`npm run e2e` expects the server running on port 8787 (`npm run build && npm start`). It drives every route and the core flows in Chromium (48 checks, including mobile layout and zero console errors). Export the bank for inspection with `npm run bank:export -- question-bank.json 20` (writes JSON and prints a 20-question readable sample).
+```bash
+npm run a11y
+```
+
+`npm run e2e` and `npm run a11y` expect the server running on port 8787 (`npm run build && npm start`). The E2E test drives every route and the core flows in Chromium (59 checks on the Node server; 63 against `npm run dev:worker`, which adds account creation, two-device sync and the friends leaderboard), including mobile layout, offline mode and zero console errors. The accessibility audit runs axe-core (WCAG 2.1 A/AA) on every route in both themes plus question, feedback, drill, exam and mobile-menu states. Export the bank for inspection with `npm run bank:export -- question-bank.json 20` (writes JSON and prints a 20-question readable sample).
 
 ---
 
@@ -68,7 +97,7 @@ npm run e2e
 ```
 src/
   engine/                 pure TypeScript, no UI — fully unit-tested
-    generators/           137 generators: arithmetic, algebra, word, geometry, data, strategy (+ qc.ts engine)
+    generators/           161 generators: arithmetic, algebra, word, geometry, data, strategy, DI sets, expert (+ qc.ts engine)
     bank.ts               deterministic bank builder, id ⇄ question reconstruction, variants
     validate.ts           structural validator (formats, choices, answers, math delimiters)
     grading.ts            answer checking (QC / MCQ / multi-select / numeric incl. fractions) + diagnosis
@@ -79,24 +108,32 @@ src/
     selection.ts          adaptive question selection; exam-form builder & section routing
     gamification.ts       XP, levels, streaks, achievements, daily objectives
     plan.ts               adaptive 30-day study plan
+    timing.ts             per-exam timing strategy (time sinks, pacing, over-cap misses)
+    drills.ts             mental-math drill generators and answer parsing
+    merge.ts              cross-device sync merge (idempotent, never drops attempts) + gzip
   store/                  zustand store, Dexie (IndexedDB) persistence, derived analytics
   components/             question player, feedback, tutor, calculator, diagrams/charts, session runner
-  pages/                  13 screens (Dashboard … Settings)
+  pages/                  15 screens (Dashboard … Mental Math, Friends, Settings)
+  lib/sync.ts, lib/pwa.ts account/sync client; service-worker registration and install prompt
   content/                curriculum taxonomy, 43 lessons, formula reference
 server/index.mjs          static hosting + optional Claude endpoints (Anthropic TypeScript SDK)
+worker/index.ts           Cloudflare Worker: accounts, sync, friends leaderboard (D1)
+wrangler.jsonc            Worker + static assets + auto-provisioned D1 binding
 tests/                    vitest suites (bank, engine, store, content, independent recomputation)
 scripts/e2e.mjs           Playwright end-to-end test
+scripts/a11y.mjs          axe-core accessibility audit
+scripts/api-test.mjs      Worker API test (run against wrangler dev)
 ```
 
 **UI:** frosted-glass three-column shell (`src/styles/glass-theme.css` + `glass-app.css`, rules in `.claude/skills/glass-ui`): sections and topic mastery on the left, question or bento dashboard in the center, recent attempts / formulas / scratchpad on the right.
 
-**Stack:** Vite + React 18 + TypeScript, react-router (hash routing), zustand, Dexie/IndexedDB, KaTeX, Recharts, custom SVG diagrams, lucide icons, Node `http` server, `@anthropic-ai/sdk`.
+**Stack:** Vite + React 18 + TypeScript, react-router (hash routing), zustand, Dexie/IndexedDB, KaTeX, Recharts, custom SVG diagrams, lucide icons, Node `http` server, `@anthropic-ai/sdk`, Cloudflare Workers + D1.
 
 ## Question generation system
 
 Each generator is a function `(seededRNG, level) → question` that picks parameters, **computes the answer from them**, and writes the stem, choices (with distractors that encode specific mistakes), step-by-step explanation, alternative method, trap, three escalating hints, and — for geometry and data interpretation — an SVG diagram or chart **drawn from the same numbers**. Most generators have several structural variants per level, not just new numbers.
 
-- **Bank:** every generator × level × 3 seeds (de-duplicated) → 1,158 questions with stable ids (`generatorId~level~seed`). Any question can be rebuilt from its id, so attempts store only ids.
+- **Bank:** every generator × level × 3 seeds (de-duplicated) → 1,265 questions with stable ids (`generatorId~level~seed`). Any question can be rebuilt from its id, so attempts store only ids.
 - **Variants:** new seeds on demand (unlimited practice, spaced-repetition concept reviews, "similar question").
 - **Quality gates** (all enforced by `npm test`):
   1. Structural validation of every question (formats, unique choices, valid answer indices, finite numerics, balanced math, no `NaN`/`undefined`).
@@ -121,11 +158,14 @@ Each generator is a function `(seededRNG, level) → question` that picks parame
 - **IndexedDB via Dexie**, written through on every answer: profile & settings, attempts, spaced-repetition items, exams, sessions, daily logs, saved AI questions, and session snapshots.
 - **Recovery:** in-progress mock exams and practice/daily sessions are snapshotted continuously and offered for resume after a reload or crash (verified by the E2E test).
 - **Export / import** (Settings) as a validated JSON file; import is transactional and rejects foreign or newer-schema files. Elo ratings are recomputed from history on load, so they can never drift from the record.
+- **Cloud sync (optional):** when signed in, the whole export is gzip-compressed and stored as one opaque blob per user in D1 (the Worker never parses it). Each device merges the cloud copy into its own data — attempts, exams and sessions are unioned (never lost), review items take the most recent state, settings follow whichever device edited them last — then uploads with optimistic concurrency (a stale write gets HTTP 409 and the client merges again). Sync runs after each finished session or exam, every ~30 s while answering, when the tab is hidden and when the connection returns.
+- **Offline:** a build-time service worker precaches the app shell, every route and the fonts; pages load network-first so deploys show up immediately.
 - Errors while saving surface as a visible toast; if storage is blocked (e.g. private mode) a warning banner explains that progress won't persist.
 
 ## Known limitations
 
-- Progress lives in the browser where you use the app — use Export/Import to move between devices (no cloud sync).
+- Cloud sync needs the Cloudflare deployment (the Node server reports sync as unavailable and the app falls back to Export/Import). Removing a bookmark or official score on one device can reappear after syncing with a device that still has it (merges are union-based). Daily totals for a day studied on two devices are merged by maximum, so they can slightly undercount.
+- The friends leaderboard compares Daily Challenge points; each person's challenge is matched to their level, so it rewards consistency rather than being a like-for-like contest.
 - The AI tutor and AI question generator need `ANTHROPIC_API_KEY` on the server; they were implemented against the SDK but not exercised live in the build environment (no key was available). The offline tutor is the default.
 - Score estimates are model-based approximations calibrated by assumption (≈ 75% accuracy on Medium ≈ 157), not ETS's proprietary scaling.
 - Generated questions are GRE-style; wording is templated, so very heavy users will recognise structures (numbers and variants change).
