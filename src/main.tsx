@@ -8,6 +8,8 @@ import '@fontsource/inter/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/600.css';
 import './styles.css';
+import './styles/glass-theme.css';
+import './styles/glass-app.css';
 import App from './App';
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err: Error | null }> {

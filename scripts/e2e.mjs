@@ -164,7 +164,9 @@ const overflowQ = await mp.evaluate(() => document.documentElement.scrollWidth -
 check('mobile: no horizontal overflow on question', overflowQ <= 1, `overflow=${overflowQ}px`);
 await mp.screenshot({ path: `${SHOTS}/12-mobile-question.png` });
 await mp.getByRole('button', { name: 'Open menu' }).click(); await mp.waitForTimeout(300);
-check('mobile: menu opens', await mp.locator('.sidebar.open').count() === 1);
+check('mobile: menu opens', await mp.locator('.app-sidebar.open').count() === 1);
+await mp.locator('.app-sidebar').getByRole('link', { name: 'Analytics' }).click(); await mp.waitForTimeout(500);
+check('mobile: tapping a menu item navigates', mp.url().endsWith('#/analytics') && (await mp.locator('.app-sidebar.open').count()) === 0, mp.url());
 await mp.screenshot({ path: `${SHOTS}/13-mobile-menu.png` });
 
 check('no console/page errors', errors.length === 0, errors.slice(0, 8).join(' | '));

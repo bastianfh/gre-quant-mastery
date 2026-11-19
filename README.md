@@ -59,7 +59,7 @@ npm test
 npm run e2e
 ```
 
-`npm run e2e` expects the server running on port 8787 (`npm run build && npm start`). It drives every route and the core flows in Chromium (47 checks, including mobile layout and zero console errors). Export the bank for inspection with `npm run bank:export -- question-bank.json 20` (writes JSON and prints a 20-question readable sample).
+`npm run e2e` expects the server running on port 8787 (`npm run build && npm start`). It drives every route and the core flows in Chromium (48 checks, including mobile layout and zero console errors). Export the bank for inspection with `npm run bank:export -- question-bank.json 20` (writes JSON and prints a 20-question readable sample).
 
 ---
 
@@ -87,6 +87,8 @@ server/index.mjs          static hosting + optional Claude endpoints (Anthropic 
 tests/                    vitest suites (bank, engine, store, content, independent recomputation)
 scripts/e2e.mjs           Playwright end-to-end test
 ```
+
+**UI:** frosted-glass three-column shell (`src/styles/glass-theme.css` + `glass-app.css`, rules in `.claude/skills/glass-ui`): sections and topic mastery on the left, question or bento dashboard in the center, recent attempts / formulas / scratchpad on the right.
 
 **Stack:** Vite + React 18 + TypeScript, react-router (hash routing), zustand, Dexie/IndexedDB, KaTeX, Recharts, custom SVG diagrams, lucide icons, Node `http` server, `@anthropic-ai/sdk`.
 

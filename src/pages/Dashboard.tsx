@@ -5,7 +5,7 @@ import { useDerived } from '../store/hooks';
 import { planForDay } from '../engine/plan';
 import { CATEGORIES, MAIN_CATEGORIES, UNIT_BY_ID, CATEGORY_BY_ID } from '../content/curriculum';
 import { dailyObjectives, dayKey, daysBetween, ACHIEVEMENTS } from '../engine/gamification';
-import { BandTag, Card, Progress, Stat, fmtTime, pctStr, usePalette } from '../components/ui';
+import { BandTag, Card, Progress, fmtTime, pctStr, usePalette } from '../components/ui';
 import { LineSeries } from '../components/Charts';
 
 export default function Dashboard() {
@@ -34,37 +34,53 @@ export default function Dashboard() {
   const recentAch = Object.entries(s.profile.achievements).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => ACHIEVEMENTS.find((a) => a.id === id)).filter(Boolean);
   const progressToTarget = est.score ? Math.max(0, Math.min(1, (est.score - 130) / (target - 130))) : 0;
   const todayQs = log?.questions ?? 0;
+  const overallMastery = Math.round(MAIN_CATEGORIES.reduce((a, c) => a + d.categoryMastery[c].score, 0) / MAIN_CATEGORIES.length);
 
   return (
     <div className="fade-in">
-      <div className="grid g-hero">
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div className="row between top">
-            <div>
-              <div className="upper">Estimated GRE Quant score</div>
-              <div className="row mt8" style={{ alignItems: 'baseline', gap: 14 }}>
-                <span className="hero-score num" data-testid="est-score">{est.score ?? '—'}</span>
-                {est.range && <span className="ink2 mono">range {est.range[0]}–{est.range[1]}</span>}
-              </div>
-              <div className="small muted mt8 row" style={{ gap: 6 }}><Info size={13} /> {est.score ? `Approximation from your practice & simulations · ${est.confidence} confidence. Not an official ETS score.` : 'Answer 10+ questions or take the diagnostic to unlock an estimate.'}</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className="upper">Target</div>
-              <div className="num" style={{ fontSize: 30, fontWeight: 600 }}>{target}</div>
-              <div className="small muted">{daysLeft} days to exam</div>
-            </div>
-          </div>
+      <div className="bento" aria-label="Key metrics">
+        <div className="bento-card bento-card--warm">
+          <div className="bento-label">Estimated score</div>
+          <div><span className="bento-value" data-testid="est-score">{est.score ?? '—'}</span>{est.range && <span className="bento-sub"> &nbsp;{est.range[0]}–{est.range[1]}</span>}</div>
+          <div className="bento-track" aria-hidden><i style={{ width: `${progressToTarget * 100}%` }} /></div>
+          <div className="bento-sub">{est.score ? (est.score >= target ? `On target (${target})` : `${target - est.score} pts to target ${target}`) : 'Answer 10+ questions to unlock'}</div>
+        </div>
+        <div className="bento-card bento-card--coral">
+          <div className="bento-label">Pace</div>
+          <div className="bento-value">{d.totals.n ? fmtTime(d.totals.avgTimeSec) : '—'}</div>
+          <div className="bento-track" aria-hidden><i style={{ width: `${d.totals.n ? Math.min(1, 104 / Math.max(1, d.totals.avgTimeSec)) * 100 : 0}%` }} /></div>
+          <div className="bento-sub">avg per question · GRE pace ≈ 1:45</div>
+        </div>
+        <div className="bento-card bento-card--sage">
+          <div className="bento-label">Accuracy · streak</div>
+          <div className="bento-value">{d.totals.n ? pctStr(d.totals.accuracy) : '—'}</div>
+          <div className="bento-track" aria-hidden><i style={{ width: `${d.totals.accuracy * 100}%` }} /></div>
+          <div className="bento-sub">{d.totals.correct}/{d.totals.n} correct · {d.streak.current}-day streak (best {d.streak.longest})</div>
+        </div>
+        <div className="bento-card bento-card--mist">
+          <div className="bento-label">Topic mastery</div>
+          <div className="bento-value">{overallMastery}%</div>
+          <div className="bento-track" aria-hidden><i style={{ width: `${overallMastery}%` }} /></div>
+          <div className="bento-sub">average of 5 topic areas · {Math.round(d.coverage * 100)}% of topics practised</div>
+        </div>
+      </div>
+      <div className="small muted mt8 row" style={{ gap: 6 }}><Info size={13} /> {est.score ? `Score estimate: ${est.confidence} confidence, from your practice & simulations. An approximation — not an official ETS score.` : 'Take the diagnostic exam to get a baseline score estimate.'}</div>
+
+      <div className="grid g-hero mt16">
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <div className="row between small mb8"><span className="muted">Progress toward target (130 → {target})</span><b className="mono">{est.score ? (est.score >= target ? 'On target' : `${target - est.score} pts to go`) : '—'}</b></div>
-            <Progress value={progressToTarget} height={8} color={est.score && est.score >= target ? 'var(--good)' : undefined} />
-          </div>
-          <div className="card tight" style={{ background: 'var(--surface-2)' }}>
             <div className="upper">Recommended next</div>
             <div className="row between mt8 wrap">
-              <div className="grow"><b>{rec.title}</b><div className="small ink2">{rec.why}</div></div>
+              <div className="grow"><b style={{ fontSize: 16 }}>{rec.title}</b><div className="small ink2 mt8">{rec.why}</div></div>
               <button className="btn primary" onClick={() => nav(rec.to)} data-testid="rec-start"><rec.icon size={15} /> Start</button>
             </div>
           </div>
+          <div className="grid g3" style={{ gap: 12 }}>
+            <div className="glass-panel stat" style={{ padding: 14 }}><div className="label">Questions completed</div><div className="value num">{d.totals.n.toLocaleString()}</div><div className="sub">{d.totals.skipped} skipped</div></div>
+            <div className="glass-panel stat" style={{ padding: 14 }}><div className="label">Daily goal</div><div className="value num">{todayQs}/{s.profile.dailyQuestionGoal}</div><div className="sub"><Progress value={todayQs / s.profile.dailyQuestionGoal} /></div></div>
+            <div className="glass-panel stat" style={{ padding: 14 }}><div className="label">Reviews due</div><div className="value num">{d.due.length}</div><div className="sub"><Link to="/lab">Wrong Answer Lab</Link></div></div>
+          </div>
+          <div className="small muted">{daysLeft} days to your exam · target {target}</div>
         </div>
         <Card title={`Today's training · Day ${plan.day}/${plan.total}`} action={<Link to="/plan" className="small">Full plan</Link>}>
           <div className="small muted mb8">{plan.phase} — {plan.focus}</div>
@@ -80,15 +96,6 @@ export default function Dashboard() {
           </div>
           <div className="tiny muted mt8 mono">≈ {plan.blocks.reduce((a, b) => a + b.minutes, 0)} min planned · adapts daily to your results</div>
         </Card>
-      </div>
-
-      <div className="grid g6 mt16">
-        <Stat label="Overall accuracy" value={d.totals.n ? pctStr(d.totals.accuracy) : '—'} sub={`${d.totals.correct} / ${d.totals.n} correct`} />
-        <Stat label="Avg solving time" value={d.totals.n ? fmtTime(d.totals.avgTimeSec) : '—'} sub="GRE pace ≈ 1:45" />
-        <Stat label="Questions completed" value={d.totals.n.toLocaleString()} sub={`${d.totals.skipped} skipped`} />
-        <Stat label="Current streak" value={`${d.streak.current}d`} sub={`longest ${d.streak.longest}d · ${d.streak.last7}/7 this week`} />
-        <Stat label="Daily goal" value={`${todayQs}/${s.profile.dailyQuestionGoal}`} sub={<Progress value={todayQs / s.profile.dailyQuestionGoal} />} />
-        <Stat label="Reviews due" value={d.due.length} sub={<Link to="/lab">Open Wrong Answer Lab</Link>} />
       </div>
 
       <div className="grid g3 mt16">

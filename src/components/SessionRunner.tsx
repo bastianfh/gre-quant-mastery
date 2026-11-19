@@ -143,7 +143,7 @@ export function SessionRunner(p: SessionProps) {
         if (submitted) advance(); else if (!answerIsBlank(q, answer)) submit();
         return;
       }
-      if (tag === 'INPUT' || submitted) return;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || submitted) return;
       const n = 'abcdefgh'.indexOf(e.key.toLowerCase());
       const num = Number(e.key) - 1;
       const k = n >= 0 ? n : num >= 0 && num < 8 ? num : -1;

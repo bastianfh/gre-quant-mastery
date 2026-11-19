@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Glass UI bridge — maps the app's existing design tokens onto the glass
+   theme (src/styles/glass-theme.css) and lays out the 3-column .app-shell.
+   Style-only: no component logic depends on anything in this file.
+   Dark theme = glass. Light theme keeps the existing light tokens.
+   ========================================================================== */
+
+/* ---------- token mapping (dark / glass) ---------- */
+:root:not([data-theme='light']) {
+  --page: #0c0e13;
+  --surface: var(--glass-card);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --surface-3: rgba(255, 255, 255, 0.1);
+  --border: var(--glass-border);
+  --border-strong: rgba(255, 255, 255, 0.17);
+  --ink: var(--text-primary);
+  --ink-2: #b4bac3;
+  /* --text-muted (#6b7280) is too dim for small text on glass; this keeps ≥4.5:1 */
+  --muted: #8d949e;
+  --grid: rgba(255, 255, 255, 0.07);
+  --axis: rgba(255, 255, 255, 0.16);
+  /* accent = the "mist" tint for focus/selection; solid colour stays on bento cards */
+  --accent: var(--accent-mist);
+  --accent-ink: var(--text-on-accent);
+  --accent-soft: rgba(166, 216, 240, 0.12);
+  --radius: var(--radius-card);
+  --radius-sm: 12px;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+:root[data-theme='light'] body { background: var(--page); color: var(--ink); }
+
+/* ---------- the floating app window ---------- */
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  height: calc(100vh - 3rem);
+  min-height: 0;
+  max-width: 1640px;
+  grid-template-columns: 236px minmax(0, 1fr) 300px;
+  /* Blur lives on ::before: backdrop-filter on the shell itself would become the containing
+     block for position:fixed children (calculator, dialogs, toasts) and clip them. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.app-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  backdrop-filter: var(--blur-heavy);
+  -webkit-backdrop-filter: var(--blur-heavy);
+}
+:root[data-theme='light'] .app-shell { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow); }
+:root[data-theme='light'] .app-shell::before { display: none; }
+
+.app-sidebar, .app-rail { min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.app-sidebar { display: flex; flex-direction: column; gap: 2px; padding: 20px 12px; }
+.app-main { min-width: 0; min-height: 0; padding: 0; display: flex; flex-direction: column; overflow-y: auto; container-type: inline-size; scrollbar-width: thin; }
+.app-rail { display: flex; flex-direction: column; gap: 14px; padding: 20px 16px; }
+:root[data-theme='light'] .app-sidebar { background: var(--surface-2); border-color: var(--border); }
+:root[data-theme='light'] .app-rail { background: var(--surface-2); border-color: var(--border); }
+
+/* sidebar groups */
+.nav-group { margin: 14px 10px 6px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.nav-item { border-radius: var(--radius-pill); padding: 7px 12px; }
+.nav-item.active { background: var(--glass-card-hover, var(--accent-soft)); box-shadow: inset 0 0 0 1px var(--border); }
+.nav-item.active svg { color: var(--accent); }
+.topic-link { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 6px 12px; border-radius: var(--radius-pill); color: var(--ink-2); font-size: 13px; }
+.topic-link:hover { background: var(--surface-2); color: var(--ink); }
+.topic-link .pct { font-family: var(--mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.topic-link .meter { grid-column: 2 / 4; height: 3px; border-radius: 2px; background: var(--surface-3); overflow: hidden; margin-top: -3px; }
+.topic-link .meter > i { display: block; height: 100%; border-radius: 2px; }
+.brand { padding: 2px 10px 12px; }
+.brand-mark { border-radius: 10px; background: var(--surface-3); }
+
+/* top bar inside the center column */
+.topbar { background: transparent; backdrop-filter: none; border-bottom: 1px solid var(--border); padding: 14px 28px; }
+:root:not([data-theme='light']) .topbar { background: rgba(15, 17, 22, 0.35); backdrop-filter: var(--blur-light); -webkit-backdrop-filter: var(--blur-light); }
+.content { padding: 28px; max-width: 1240px; }
+
+/* ---------- glass surfaces ---------- */
+:root:not([data-theme='light']) .card,
+:root:not([data-theme='light']) .q-card,
+:root:not([data-theme='light']) .exam-bar,
+:root:not([data-theme='light']) .feedback {
+  background: var(--glass-card);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+}
+.card, .q-card, .feedback, .exam-bar { border-radius: var(--radius-card); }
+:root:not([data-theme='light']) .modal { background: rgba(24, 27, 34, 0.92); backdrop-filter: var(--blur-heavy); -webkit-backdrop-filter: var(--blur-heavy); border-color: var(--glass-border); }
+:root:not([data-theme='light']) .calc,
+:root:not([data-theme='light']) .toast { background: rgba(24, 27, 34, 0.9); backdrop-filter: var(--blur-heavy); -webkit-backdrop-filter: var(--blur-heavy); }
+.overlay { background: rgba(6, 8, 12, 0.6); }
+
+/* ---------- controls ---------- */
+.btn { border-radius: var(--radius-pill); }
+.btn.icon { border-radius: 50%; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--accent-ink, #fff); }
+:root[data-theme='light'] .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { filter: none; opacity: 0.9; }
+.seg { border-radius: var(--radius-pill); }
+.seg button { border-radius: var(--radius-pill); }
+input, select, textarea { border-radius: 12px; }
+.choice { border-radius: 14px; }
+.choice.sel .key { color: var(--accent-ink, #fff); }
+.callout { border-radius: 0 12px 12px 0; }
+.pill { background: var(--surface-3); }
+
+/* tabular numerals for every counter, timer and score */
+.timer, .num, .mono, .hero-score, .stat .value, .bento-value, .qcell, table.data td.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- bento metric cards ---------- */
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.bento-card { min-height: 148px; gap: 10px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.bento-card .bento-label { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.72; display: flex; align-items: center; gap: 6px; }
+.bento-card .bento-value { font-size: 2.4rem; line-height: 1; }
+.bento-card .bento-sub { font-size: 12.5px; font-weight: 500; opacity: 0.78; }
+.bento-card .bento-track { height: 6px; border-radius: 3px; background: rgba(17, 19, 24, 0.14); overflow: hidden; }
+.bento-card .bento-track > i { display: block; height: 100%; background: var(--text-on-accent); border-radius: 3px; }
+.bento-card a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- right rail ---------- */
+.rail-section { display: flex; flex-direction: column; gap: 8px; }
+.rail-title { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.rail-title a { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.attempt-row { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12.5px; padding: 6px 2px; border-bottom: 1px solid var(--border); }
+.attempt-row:last-child { border-bottom: 0; }
+.attempt-row .t { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attempt-row .m { font-family: var(--mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rail-formula { padding: 9px 11px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); overflow-x: auto; }
+.rail-formula .n { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.scratchpad { width: 100%; min-height: 150px; resize: vertical; font-family: var(--mono); font-size: 13px; line-height: 1.55; background: rgba(0, 0, 0, 0.2); }
+
+/* question + tutor stack when the center column is narrow */
+@container (max-width: 980px) { .session-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+.app-main .q-wrap { margin: 0 auto; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1279px) {
+  .app-shell { grid-template-columns: 236px minmax(0, 1fr); }
+  .app-rail { display: none; }
+}
+@media (max-width: 1100px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1024px) {
+  .app-shell { display: block; height: auto; min-height: 100vh; margin: 0; border: 0; border-radius: 0; overflow: visible; box-shadow: none; }
+  .app-shell::before { border-radius: 0; }
+  .app-main { overflow: visible; }
+  /* the theme hides the sidebar here; keep navigation as a slide-out drawer instead */
+  .app-sidebar { display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 80; width: 270px; transform: translateX(-100%); transition: transform 0.2s ease; background: rgba(15, 17, 22, 0.94); border-right: 1px solid var(--glass-border); }
+  :root[data-theme='light'] .app-sidebar { background: var(--surface); }
+  .app-sidebar.open { transform: none; box-shadow: var(--shadow); }
+  .menu-btn { display: inline-flex; }
+  .topbar { position: sticky; top: 0; z-index: 20; padding: 10px 16px; }
+  .content { padding: 16px; }
+}
+@media (max-width: 860px) { .topbar .ticker .hide-sm { display: none; } }
+@media (max-width: 560px) { .bento { grid-template-columns: minmax(0, 1fr); } .bento-card { min-height: 0; } }
+
+:root[data-theme='light'] .nav-item.active { background: var(--accent-soft); }
+
+/* light theme: glass panels and scratchpad need visible light-mode values */
+:root[data-theme='light'] .glass-panel { background: var(--surface-2); border-color: var(--border); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+:root[data-theme='light'] .scratchpad { background: var(--surface); }
+
+/* phones/tablets: the shell is full-bleed, so drop its blur layer — its stacking context
+   would otherwise trap the drawer underneath the page scrim and block taps on the menu */
+@media (max-width: 1024px) { .app-shell { isolation: auto; } .app-shell::before { display: none; } }
