@@ -15,6 +15,7 @@ import { Card, PageHead, Stat, fmtTime, pctStr, uid } from '../components/ui';
 import { LineSeries } from '../components/LazyCharts';
 import { TimingStrategy } from '../components/TimingStrategy';
 import { useStore } from '../store/store';
+import { useAnsweringMode } from '../store/ui';
 
 const LIMITS = [21 * 60, 26 * 60];
 interface Sec { qids: string[]; answers: UserAnswer[]; marked: boolean[]; timeMs: number[]; remaining: number; idx: number }
@@ -83,6 +84,7 @@ export default function Mock() {
 }
 
 function ExamRunner({ exam, setExam, onFinish, onQuit }: { exam: ExamState; setExam: (e: ExamState) => void; onFinish: (r: ExamResult) => void; onQuit: () => void }) {
+  useAnsweringMode();
   const store = useStore();
   const [calc, setCalc] = useState(false);
   const [confirm, setConfirm] = useState(false);

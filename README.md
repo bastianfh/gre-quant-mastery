@@ -125,7 +125,7 @@ scripts/a11y.mjs          axe-core accessibility audit
 scripts/api-test.mjs      Worker API test (run against wrangler dev)
 ```
 
-**UI:** frosted-glass three-column shell (`src/styles/glass-theme.css` + `glass-app.css`, rules in `.claude/skills/glass-ui`): sections and topic mastery on the left, question or bento dashboard in the center, recent attempts / formulas / scratchpad on the right.
+**UI:** frosted-glass three-column shell (`src/styles/glass-theme.css` + `glass-app.css`, rules in `.claude/skills/glass-ui`): six destinations on the left (Dashboard, Study Plan, Practice, Mock Exams, Wrong Answer Lab, Analytics; practice modes and study resources are tabs inside their section). The Dashboard leads with one recommended action, then a compact metric row; detail panels appear after the first session. The right rail is context-aware: today's training checklist and recent activity normally, quick formulas and a scratchpad while answering questions or reading a lesson.
 
 **Stack:** Vite + React 18 + TypeScript, react-router (hash routing), zustand, Dexie/IndexedDB, KaTeX, Recharts, custom SVG diagrams, lucide icons, Node `http` server, `@anthropic-ai/sdk`, Cloudflare Workers + D1.
 

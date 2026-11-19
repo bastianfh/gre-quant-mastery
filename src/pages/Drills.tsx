@@ -4,6 +4,7 @@ import { DRILL_KINDS, ROUND_SEC, drillStream, drillXp, type DrillItem, type Dril
 import { Card, PageHead } from '../components/ui';
 import { Md } from '../components/Md';
 import { useStore } from '../store/store';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 interface Miss { prompt: string; answer: string; given: string }
 interface RoundResult { kind: DrillKind; correct: number; wrong: number; misses: Miss[]; best: number; isBest: boolean }
@@ -30,6 +31,7 @@ export default function Drills() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Mental-Math Drills" sub={`${ROUND_SEC}-second rapid-fire rounds. Type the answer and press Enter. These build arithmetic fluency and don't affect topic mastery.`} />
       {result && (
         <Card title="Round complete" className="mb16">

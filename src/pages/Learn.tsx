@@ -4,6 +4,7 @@ import { CATEGORIES, unitsOf } from '../content/curriculum';
 import { BandTag, Card, PageHead, Progress } from '../components/ui';
 import { useStore } from '../store/store';
 import { useDerived } from '../store/hooks';
+import { SectionTabs, PLAN_TABS } from '../components/SectionTabs';
 
 export default function Learn() {
   const p = useStore((s) => s.profile);
@@ -12,6 +13,7 @@ export default function Learn() {
   const done = Object.keys(p.lessonsCompleted).length;
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PLAN_TABS} label="Study plan sections" />
       <PageHead title="Learn" sub="The complete GRE Quant curriculum — concepts, formulas, worked examples, traps, strategies, practice and a mastery check for every topic. GRE scope only: no calculus or trigonometry.">
         <div style={{ width: 220 }}><div className="row between small mb8"><span className="muted">Lessons completed</span><b className="mono">{done}/{total}</b></div><Progress value={done / total} /></div>
       </PageHead>

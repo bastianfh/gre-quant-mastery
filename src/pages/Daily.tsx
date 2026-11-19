@@ -11,6 +11,7 @@ import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { usePickCtx, useDerived } from '../store/hooks';
 import { UNIT_BY_ID } from '../content/curriculum';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 export const dailyScore = (s: SessionSummary, totalSec: number) => {
   const pts = s.rows.reduce((a, r) => a + (r.correct ? r.q.level * 10 : 0), 0);
@@ -53,6 +54,7 @@ export default function Daily() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Daily Challenge" sub="12 fresh questions each day: mixed topics, rising difficulty, weighted toward your weak areas, under time pressure." />
       <div className="grid g4">
         <Stat label="Today" value={todayScore !== undefined ? `${todayScore} pts` : 'Not played'} sub={todayScore !== undefined ? 'Replay to practise; best score counts' : `${Math.round(totalSec / 60)} min time limit`} />

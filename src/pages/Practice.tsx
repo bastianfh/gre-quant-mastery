@@ -9,6 +9,7 @@ import { SessionRunner } from '../components/SessionRunner';
 import { Card, PageHead, Seg } from '../components/ui';
 import { usePickCtx, useDerived } from '../store/hooks';
 import { useStore } from '../store/store';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 export default function Practice() {
   const [sp, setSp] = useSearchParams();
@@ -45,13 +46,14 @@ export default function Practice() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Practice" sub="Unlimited adaptive practice. Difficulty targets the level where you succeed about 70% of the time unless you pick levels yourself." />
       <div className="grid g3">
         <Card title="Topics" className="span2">
           <div className="row wrap" style={{ gap: 6 }}>
             <button className={`chip ${!cats.length && !units.length ? 'on' : ''}`} onClick={() => { setCats([]); setUnits([]); }}>Mixed (all topics)</button>
             <button className="chip" disabled={!weak.length} onClick={() => { setCats([]); setUnits(weak); }} title={weak.length ? '' : 'No weak topics identified yet'}>Weak topics{weak.length ? ` (${weak.length})` : ''}</button>
-            {CATEGORIES.map((c) => <button key={c.id} className={`chip ${cats.includes(c.id) ? 'on' : ''}`} onClick={() => toggle(cats, c.id, setCats)}><i className="dot" style={{ background: c.color }} />{c.name}</button>)}
+            {CATEGORIES.map((c) => <button key={c.id} className={`chip ${cats.includes(c.id) ? 'on' : ''}`} onClick={() => toggle(cats, c.id, setCats)}><i className="dot" style={{ background: c.color }} />{c.name}{d.categoryMastery[c.id]?.n ? <span className="chip-pct num" title={`${c.name} mastery`}>{d.categoryMastery[c.id].score}%</span> : null}</button>)}
           </div>
           <div className="upper mt16 mb8">Subtopics</div>
           {CATEGORIES.map((c) => (

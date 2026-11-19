@@ -4,6 +4,7 @@ import { FORMULAS } from '../content/formulas';
 import { Md } from '../components/Md';
 import { Card, PageHead, Seg } from '../components/ui';
 import { useStore } from '../store/store';
+import { SectionTabs, PLAN_TABS } from '../components/SectionTabs';
 
 const TIPS = [
   'Multiply by 10% / 5% / 1% mentally and combine (e.g. 15% = 10% + 5%).',
@@ -21,6 +22,7 @@ export default function Formulas() {
   const match = (t: string) => t.toLowerCase().includes(q.toLowerCase());
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PLAN_TABS} label="Study plan sections" />
       <PageHead title="Formula Reference" sub="Everything the GRE Quant section expects you to know. Bookmark the ones you hesitate on.">
         <div className="row" style={{ gap: 6 }}><Search size={14} className="muted" /><input placeholder="Search formulas" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search formulas" /></div>
         <Seg value={only} onChange={setOnly} options={[{ v: 'all', label: 'All' }, { v: 'saved', label: `Bookmarked (${marks.length})` }]} />

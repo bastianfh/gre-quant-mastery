@@ -10,6 +10,7 @@ import { useStore } from '../store/store';
 import { usePickCtx } from '../store/hooks';
 import { MAIN_CATEGORIES, CATEGORY_BY_ID } from '../content/curriculum';
 import { QC_CHOICES } from '../engine/types';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 const RULES = [
   'Treat the two quantities like the sides of an inequality: add, subtract, multiply or divide both by the same thing — but only multiply/divide by quantities known to be positive.',
@@ -38,6 +39,7 @@ export default function QcArena() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Quantitative Comparison Arena" sub="Dedicated training for the GRE's comparison format — tracked separately from other question types." />
       <div className="grid g4">
         <Stat label="QC mastery" value={qcAt.length ? `${m.score}%` : '—'} sub={<BandTag band={m.band} />} />

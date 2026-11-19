@@ -10,6 +10,7 @@ import { Bars } from '../components/LazyCharts';
 import { useStore } from '../store/store';
 import { usePickCtx, useDerived } from '../store/hooks';
 import type { Level } from '../engine/types';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 const LIMITS = [30, 45, 60, 90, 120];
 const LEVELS_FOR: Record<number, Level[]> = { 30: [1, 2], 45: [1, 2, 3], 60: [2, 3], 90: [3, 4], 120: [4, 5] };
@@ -45,6 +46,7 @@ export default function Speed() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Speed Training" sub="Timed drills that build pace without sacrificing accuracy. Questions auto-submit when time runs out." />
       <div className="grid g3">
         <Card title="Start a drill" className="span2">

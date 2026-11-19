@@ -42,10 +42,21 @@ for (const r of routes) {
 }
 await go('/'); await shot('01-dashboard-empty');
 
+// 1b. calm dashboard layout
+check('layout: no top stats strip', (await page.locator('.ticker').count()) === 0);
+check('layout: sidebar has 6 main links', (await page.locator('.app-sidebar nav[aria-label=Main] a').count()) === 6);
+check('layout: hero CTA comes before the metrics', await page.evaluate(() => { const h = document.querySelector('.hero-action'), b = document.querySelector('.bento'); return !!h && !!b && !!(h.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING); }));
+check('layout: locked metrics instead of dashes', (await page.locator('.bento-locked').count()) === 4 && !(await page.locator('.bento').innerText()).includes('—'));
+check('layout: no topic panels before the first session', (await page.locator('main .card-head:has-text("Weakest topics")').count()) === 0);
+check('rail: dashboard shows training checklist, no scratchpad', (await page.locator('.app-rail .checklist').count()) === 1 && (await page.locator('.app-rail .scratchpad').count()) === 0);
+await go('/daily');
+check('nav: Practice stays active on a practice mode tab', (await page.locator('.app-sidebar .nav-item.active').innerText()).includes('Practice') && (await page.locator('.section-tab.on').innerText()).includes('Daily'));
+
 // 2. practice flow with immediate feedback, hints, calculator
 await go('/practice');
 await page.getByTestId('start-practice').click();
 await page.waitForTimeout(300);
+check('rail: answering shows formulas + scratchpad', (await page.locator('.app-rail .scratchpad').count()) === 1 && (await page.locator('.app-rail .rail-formula').count()) > 0 && (await page.locator('.app-rail .checklist').count()) === 0);
 await shot('02-practice-question');
 await page.getByRole('button', { name: 'Hints & tutor' }).click();
 await page.getByRole('button', { name: /Show hint 1/ }).click();

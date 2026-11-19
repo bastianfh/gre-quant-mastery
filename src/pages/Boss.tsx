@@ -8,6 +8,7 @@ import { SessionRunner, type SessionSummary } from '../components/SessionRunner'
 import { Card, PageHead } from '../components/ui';
 import { useStore } from '../store/store';
 import { usePickCtx } from '../store/hooks';
+import { SectionTabs, PRACTICE_TABS } from '../components/SectionTabs';
 
 interface BossDef { id: string; name: string; combo: string; cats: CategoryId[]; units?: string[]; n: number }
 const BOSSES: BossDef[] = [
@@ -52,6 +53,7 @@ export default function Boss() {
 
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PRACTICE_TABS} label="Practice modes" />
       <PageHead title="Boss Challenges" sub={`Multi-concept gauntlets of hard questions. Current tier: ${['Hard', 'Hard–Expert', 'Expert'][tier]} (rises as you clear bosses). Rank B or better defeats a boss.`} />
       <div className="grid g3">
         {BOSSES.map((b, i) => {

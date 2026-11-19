@@ -12,6 +12,7 @@ import { Tutor } from './Tutor';
 import { Calculator } from './Calculator';
 import { fmtTime, pctStr, uid } from './ui';
 import { getQuestion } from '../engine/bank';
+import { useAnsweringMode } from '../store/ui';
 
 export interface SessionResultRow { q: Question; answer: UserAnswer; correct: boolean; skipped: boolean; timeMs: number; attempt?: Attempt; timedOut?: boolean }
 export interface SessionSummary { rows: SessionResultRow[]; correct: number; total: number; timeMs: number; xp: number }
@@ -42,6 +43,7 @@ export interface SessionProps {
 interface Snap { key: string; qids: string[]; idx: number; rows: { qid: string; answer: UserAnswer; correct: boolean; skipped: boolean; timeMs: number }[]; startedAt: number }
 
 export function SessionRunner(p: SessionProps) {
+  useAnsweringMode();
   const store = useStore();
   const nav = useNavigate();
   const sessionId = useMemo(uid, []);

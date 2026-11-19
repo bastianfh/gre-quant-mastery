@@ -5,6 +5,7 @@ import { addDays, dayKey, daysBetween } from '../engine/gamification';
 import { Card, PageHead } from '../components/ui';
 import { useStore } from '../store/store';
 import { useDerived } from '../store/hooks';
+import { SectionTabs, PLAN_TABS } from '../components/SectionTabs';
 
 export default function Plan() {
   const s = useStore();
@@ -18,6 +19,7 @@ export default function Plan() {
   const dayWeek = (n: number) => { const f = n / total; return f <= 0.25 ? 1 : f <= 0.5 ? 2 : f <= 0.8 ? 3 : 4; };
   return (
     <div className="fade-in">
+      <SectionTabs tabs={PLAN_TABS} label="Study plan sections" />
       <PageHead title="Personalized study plan" sub={`Day ${todayPlan.day} of ${total} · exam ${s.profile.examDate} · ~${s.profile.dailyMinutes} min/day. The plan re-optimizes every day from your mastery data, review backlog and recent simulations.`}>
         <Link className="btn" to="/settings">Change exam date / daily time</Link>
       </PageHead>
