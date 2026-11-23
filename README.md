@@ -2,6 +2,8 @@
 
 An adaptive, gamified training system for the **current (shorter) GRE Quantitative Reasoning** section, built around a 30-day plan toward 165–170.
 
+**Live app:** https://gre-quant-mastery.bastianfh.workers.dev (works offline and can be installed to your home screen)
+
 - **1,265 validated questions** in a fixed bank (161 parametric generators × 5 difficulty levels), plus **unlimited fresh variants** of every concept — including GRE-style **data-interpretation sets** (one chart, three questions) and **Expert multi-concept** items with varied wording.
 - Every answer is **computed by code**, every question is **validated automatically**, and Quantitative Comparison answers are determined by **exhaustive edge-case testing** (zero, ±1, negatives, fractions, boundaries) — never from one example.
 - Full section-adaptive **mock exams** (12 q / 21 min → 15 q / 26 min), **Wrong Answer Lab** with spaced repetition, transparent **mastery model**, **score estimate**, analytics, lessons for all 43 curriculum units, formula reference, calculator, XP/levels/achievements, and an AI tutor (offline built-in; Claude when configured).
